@@ -1,0 +1,2 @@
+This operation will update 20 README.md files under phases/* to new frontend-focused titles.
+If any update fails, I'll adjust and retry for that file.

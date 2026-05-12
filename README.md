@@ -51,25 +51,25 @@ the top is breaking.
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'12px'}}}%%
 flowchart TB
-  P0["Phase 0 — Frontend Setup &amp; Tooling"] --> P1["Phase 1 — Math Foundations"]
-  P1 --> P2["Phase 2 — ML Fundamentals"]
-  P2 --> P3["Phase 3 — Deep Learning Core"]
-  P3 --> P4["Phase 4 — Vision"]
-  P3 --> P5["Phase 5 — NLP"]
-  P3 --> P6["Phase 6 — Speech &amp; Audio"]
-  P3 --> P9["Phase 9 — RL"]
-  P5 --> P7["Phase 7 — Transformers"]
-  P7 --> P8["Phase 8 — GenAI"]
-  P7 --> P10["Phase 10 — LLMs from Scratch"]
-  P10 --> P11["Phase 11 — LLM Engineering"]
-  P10 --> P12["Phase 12 — Multimodal"]
-  P11 --> P13["Phase 13 — Tools &amp; Protocols"]
-  P13 --> P14["Phase 14 — Agent Engineering"]
-  P14 --> P15["Phase 15 — Autonomous Systems"]
-  P15 --> P16["Phase 16 — Multi-Agent &amp; Swarms"]
-  P14 --> P17["Phase 17 — Infrastructure &amp; Production"]
-  P15 --> P18["Phase 18 — Ethics &amp; Alignment"]
-  P16 --> P19["Phase 19 — Capstone Projects"]
+  P0["Phase 0 — Frontend Setup &amp; Tooling"] --> P1["Phase 1 — HTML & Semantics"]
+  P1 --> P2["Phase 2 — CSS Fundamentals"]
+  P2 --> P3["Phase 3 — Modern Layouts & Responsive UX"]
+  P3 --> P4["Phase 4 — Styling Systems &amp; Design Tokens"]
+  P3 --> P5["Phase 5 — JavaScript Fundamentals"]
+  P3 --> P6["Phase 6 — TypeScript Essentials"]
+  P3 --> P9["Phase 9 — React Fundamentals"]
+  P5 --> P7["Phase 7 — Browser Platform & APIs"]
+  P7 --> P8["Phase 8 — Modern Tooling &amp; Build Systems"]
+  P7 --> P10["Phase 10 — React Advanced Patterns"]
+  P10 --> P11["Phase 11 — State Management"]
+  P10 --> P12["Phase 12 — Next.js & Meta-frameworks"]
+  P11 --> P13["Phase 13 — Data Layers &amp; APIs"]
+  P13 --> P14["Phase 14 — Testing & Quality"]
+  P14 --> P15["Phase 15 — Accessibility & Inclusive Design"]
+  P15 --> P16["Phase 16 — Performance &amp; Web Vitals"]
+  P14 --> P17["Phase 17 — Security &amp; Best Practices"]
+  P15 --> P18["Phase 18 — Deployment, CI/CD &amp; Observability"]
+  P16 --> P19["Phase 19 — PWAs, Mobile & Capstone Projects"]
   P17 --> P19
   P18 --> P19
 ```
@@ -258,7 +258,7 @@ Twenty phases. Click any phase to expand its lesson list.
 | 12 | [Deployment & Preview Workflow](phases/00-setup-and-tooling/12-debugging-and-profiling/) | Build | TypeScript |
 
 <details id="phase-1">
-<summary><b>Phase 1 — Math Foundations</b> &nbsp;<code>22 lessons</code>&nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
+<summary><b>Phase 1 — HTML & Semantics</b> &nbsp;<code>22 lessons</code>&nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -289,7 +289,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-2">
-<summary><b>Phase 2 — ML Fundamentals</b> &nbsp;<code>18 lessons</code>&nbsp; <em>Classical ML — still the backbone of most production AI.</em></summary>
+<summary><b>Phase 2 — CSS Fundamentals</b> &nbsp;<code>18 lessons</code>&nbsp; <em>Classical ML — still the backbone of most production AI.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -316,7 +316,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-3">
-<summary><b>Phase 3 — Deep Learning Core</b> &nbsp;<code>13 lessons</code>&nbsp; <em>Neural networks from first principles. No frameworks until you build one.</em></summary>
+<summary><b>Phase 3 — Modern Layouts & Responsive UX</b> &nbsp;<code>13 lessons</code>&nbsp; <em>Neural networks from first principles. No frameworks until you build one.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -375,7 +375,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-5">
-<summary><b>Phase 5 — NLP: Foundations to Advanced</b> &nbsp;<code>29 lessons</code>&nbsp; <em>Language is the interface to intelligence.</em></summary>
+<summary><b>Phase 5 — JavaScript Fundamentals: Foundations to Advanced</b> &nbsp;<code>29 lessons</code>&nbsp; <em>Language is the interface to intelligence.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -413,7 +413,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-6">
-<summary><b>Phase 6 — Speech & Audio</b> &nbsp;<code>17 lessons</code>&nbsp; <em>Hear, understand, speak.</em></summary>
+<summary><b>Phase 6 — TypeScript Essentials</b> &nbsp;<code>17 lessons</code>&nbsp; <em>Hear, understand, speak.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -439,7 +439,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-7">
-<summary><b>Phase 7 — Transformers Deep Dive</b> &nbsp;<code>14 lessons</code>&nbsp; <em>The architecture that changed everything.</em></summary>
+<summary><b>Phase 7 — Browser Platform & APIs Deep Dive</b> &nbsp;<code>14 lessons</code>&nbsp; <em>The architecture that changed everything.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -506,7 +506,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-10">
-<summary><b>Phase 10 — LLMs from Scratch</b> &nbsp;<code>22 lessons</code>&nbsp; <em>Build, train, and understand large language models.</em></summary>
+<summary><b>Phase 10 — React Advanced Patterns</b> &nbsp;<code>22 lessons</code>&nbsp; <em>Build, train, and understand large language models.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -537,7 +537,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-11">
-<summary><b>Phase 11 — LLM Engineering</b> &nbsp;<code>15 lessons</code>&nbsp; <em>Put LLMs to work in production.</em></summary>
+<summary><b>Phase 11 — State Management</b> &nbsp;<code>15 lessons</code>&nbsp; <em>Put LLMs to work in production.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -561,7 +561,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-12">
-<summary><b>Phase 12 — Multimodal AI</b> &nbsp;<code>25 lessons</code>&nbsp; <em>See, hear, read, and reason across modalities — from ViT patches to computer-use agents.</em></summary>
+<summary><b>Phase 12 — Next.js & Meta-frameworks AI</b> &nbsp;<code>25 lessons</code>&nbsp; <em>See, hear, read, and reason across modalities — from ViT patches to computer-use agents.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -595,7 +595,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-13">
-<summary><b>Phase 13 — Tools & Protocols</b> &nbsp;<code>23 lessons</code>&nbsp; <em>The interfaces between AI and the real world.</em></summary>
+<summary><b>Phase 13 — Data Layers & APIs</b> &nbsp;<code>23 lessons</code>&nbsp; <em>The interfaces between AI and the real world.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -627,7 +627,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-14">
-<summary><b>Phase 14 — Agent Engineering</b> &nbsp;<code>30 lessons</code>&nbsp; <em>Build agents from first principles — loop, memory, planning, frameworks, benchmarks, production.</em></summary>
+<summary><b>Phase 14 — Testing & Quality</b> &nbsp;<code>30 lessons</code>&nbsp; <em>Build agents from first principles — loop, memory, planning, frameworks, benchmarks, production.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -666,7 +666,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-15">
-<summary><b>Phase 15 — Autonomous Systems</b> &nbsp;<code>22 lessons</code>&nbsp; <em>Long-horizon agents, self-improvement, and the 2026 safety stack.</em></summary>
+<summary><b>Phase 15 — Accessibility & Inclusive Design</b> &nbsp;<code>22 lessons</code>&nbsp; <em>Long-horizon agents, self-improvement, and the 2026 safety stack.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -697,7 +697,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-16">
-<summary><b>Phase 16 — Multi-Agent & Swarms</b> &nbsp;<code>25 lessons</code>&nbsp; <em>Coordination, emergence, and collective intelligence.</em></summary>
+<summary><b>Phase 16 — Performance & Web Vitals</b> &nbsp;<code>25 lessons</code>&nbsp; <em>Coordination, emergence, and collective intelligence.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -731,7 +731,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-17">
-<summary><b>Phase 17 — Infrastructure & Production</b> &nbsp;<code>28 lessons</code>&nbsp; <em>Ship AI to the real world.</em></summary>
+<summary><b>Phase 17 — Security & Best Practices</b> &nbsp;<code>28 lessons</code>&nbsp; <em>Ship AI to the real world.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -807,7 +807,7 @@ Twenty phases. Click any phase to expand its lesson list.
 </details>
 
 <details id="phase-19">
-<summary><b>Phase 19 — Capstone Projects</b> &nbsp;<code>17 projects</code>&nbsp; <em>2026 end-to-end shippable products, 20-40 hours each.</em></summary>
+<summary><b>Phase 19 — PWAs, Mobile & Capstone Projects</b> &nbsp;<code>17 projects</code>&nbsp; <em>2026 end-to-end shippable products, 20-40 hours each.</em></summary>
 <br/>
 
 | # | Project | Combines | Lang |
@@ -856,10 +856,10 @@ Cursor, or any MCP-compatible agent. Real tools, not homework.
 | Background | Start at | Estimated time |
 |---|---|---|
 | New to programming and AI | Phase 0 — Setup | ~306 hours |
-| Know Python, new to ML | Phase 1 — Math Foundations | ~270 hours |
-| Know ML, new to deep learning | Phase 3 — Deep Learning Core | ~200 hours |
-| Know deep learning, want LLMs and agents | Phase 10 — LLMs from Scratch | ~100 hours |
-| Senior engineer, only want agent engineering | Phase 14 — Agent Engineering | ~60 hours |
+| Know Python, new to ML | Phase 1 — HTML & Semantics | ~270 hours |
+| Know ML, new to deep learning | Phase 3 — Modern Layouts & Responsive UX | ~200 hours |
+| Know deep learning, want LLMs and agents | Phase 10 — React Advanced Patterns | ~100 hours |
+| Senior engineer, only want agent engineering | Phase 14 — Testing & Quality | ~60 hours |
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
