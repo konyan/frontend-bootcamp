@@ -8,20 +8,22 @@ Total estimated time: ~300 hours, at your own pace.
 
 **Legend:** ✅ Complete &nbsp;·&nbsp; 🚧 In Progress &nbsp;·&nbsp; ⬚ Planned
 
-## Phase 0: Frontend Setup & Tooling — ⬚ (~12 hours)
+## Phase 0: Frontend Setup & Tooling — ⬚ (~16 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Dev Environment & First Steps | ⬚ | ~60 min |
-| 02 | Node.js, npm, and Package Management | ⬚ | ~45 min |
-| 03 | Git & Collaboration Basics | ⬚ | ~60 min |
-| 04 | VS Code Setup for Frontend | ⬚ | ~45 min |
-| 05 | Browser DevTools Essentials | ⬚ | ~45 min |
-| 06 | Terminal & Shell Fundamentals | ⬚ | ~60 min |
-| 07 | Build Tools & Bundlers Intro | ⬚ | ~60 min |
-| 08 | Local Development Servers | ⬚ | ~45 min |
-| 09 | Debugging & Error Handling | ⬚ | ~60 min |
-| 10 | Deployment & Preview Workflow | ⬚ | ~45 min |
+| 01 | The Modern Development Environment | ⬚ | ~60 min |
+| 02 | OS, Shell & Workflow Automation | ⬚ | ~60 min |
+| 03 | IDE Mastery with VS Code | ⬚ | ~60 min |
+| 04 | Essential Extensions & Workspace Hygiene | ⬚ | ~45 min |
+| 05 | Node.js Runtimes & Version Management | ⬚ | ~60 min |
+| 06 | pnpm and Dependency Management | ⬚ | ~60 min |
+| 07 | Advanced Git Workflow | ⬚ | ~75 min |
+| 08 | Conventional Commits & Git Hooks | ⬚ | ~75 min |
+| 09 | SWC, Babel & Transpilation | ⬚ | ~75 min |
+| 10 | TypeScript Configuration & Path Aliases | ⬚ | ~75 min |
+| 11 | Build Optimization & Asset Pipelines | ⬚ | ~75 min |
+| 12 | Deployment & Preview Workflow | ⬚ | ~60 min |
 
 ## Phase 1: HTML & Semantics — ⬚ (~10 hours)
 

@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Why do many frontend teams prefer pnpm?",
+      "options": [
+        "It ignores lockfiles",
+        "It is fast and uses disk space efficiently",
+        "It removes the need for package.json",
+        "It only works on Linux"
+      ],
+      "correct": 1,
+      "explanation": "pnpm is valued for speed, efficient storage, and strict dependency resolution."
+    },
+    {
+      "stage": "pre",
+      "question": "What does a lockfile help with?",
+      "options": [
+        "Pinning dependency versions for reproducible installs",
+        "Adding CSS variables automatically",
+        "Compiling JSX",
+        "Running Git hooks"
+      ],
+      "correct": 0,
+      "explanation": "Lockfiles keep installs consistent across machines and CI."
+    },
+    {
+      "stage": "post",
+      "question": "What problem does a strict dependency manager help expose?",
+      "options": [
+        "Hidden reliance on undeclared packages",
+        "Browser rendering speed",
+        "The color of the terminal prompt",
+        "The number of Git remotes"
+      ],
+      "correct": 0,
+      "explanation": "Strict resolution makes it easier to catch dependencies that were never declared properly."
+    },
+    {
+      "stage": "post",
+      "question": "What is a workspace install useful for?",
+      "options": [
+        "Managing multiple packages in one repository",
+        "Turning JavaScript into HTML",
+        "Replacing the browser cache",
+        "Ignoring peer dependencies entirely"
+      ],
+      "correct": 0,
+      "explanation": "Workspace installs are common in monorepos and shared package setups."
+    }
+  ]
+}

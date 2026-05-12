@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What is the main goal of conventional commits?",
+      "options": [
+        "To make Git slower",
+        "To standardize commit messages for automation and clarity",
+        "To replace code reviews",
+        "To compile TypeScript"
+      ],
+      "correct": 1,
+      "explanation": "A standardized commit format helps teams automate changelogs and read history more easily."
+    },
+    {
+      "stage": "pre",
+      "question": "What does a pre-commit hook run?",
+      "options": [
+        "Commands before the commit is created",
+        "Commands after the branch is deleted",
+        "Commands only in production",
+        "Commands inside the browser console"
+      ],
+      "correct": 0,
+      "explanation": "Pre-commit hooks run before a commit is recorded so they can block bad changes."
+    },
+    {
+      "stage": "post",
+      "question": "Why are git hooks useful in frontend repos?",
+      "options": [
+        "They can run lint or test checks before code is committed",
+        "They replace package managers",
+        "They remove the need for branches",
+        "They make CSS variables optional"
+      ],
+      "correct": 0,
+      "explanation": "Hooks automate simple quality gates before code reaches the repository."
+    },
+    {
+      "stage": "post",
+      "question": "What is a good example of a conventional commit prefix?",
+      "options": [
+        "feat",
+        "launch",
+        "green",
+        "patchy"
+      ],
+      "correct": 0,
+      "explanation": "feat is a common conventional commit type for a new feature."
+    }
+  ]
+}

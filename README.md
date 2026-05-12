@@ -244,18 +244,18 @@ Twenty phases. Click any phase to expand its lesson list.
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [Frontend Environment](phases/00-setup-and-tooling/01-dev-environment/) | Build | TypeScript |
-| 02 | [HTML & Semantic Structure](phases/00-setup-and-tooling/02-git-and-collaboration/) | Build | HTML |
-| 03 | [CSS Foundations](phases/00-setup-and-tooling/03-gpu-setup-and-cloud/) | Build | CSS |
-| 04 | [JavaScript in the Browser](phases/00-setup-and-tooling/04-apis-and-keys/) | Build | JavaScript |
-| 05 | [TypeScript Essentials](phases/00-setup-and-tooling/05-jupyter-notebooks/) | Build | TypeScript |
-| 06 | [Git & Collaboration](phases/00-setup-and-tooling/06-python-environments/) | Learn | — |
-| 07 | [Node.js, npm & Vite](phases/00-setup-and-tooling/07-docker-for-ai/) | Build | TypeScript |
-| 08 | [Browser DevTools](phases/00-setup-and-tooling/08-editor-setup/) | Build | — |
-| 09 | [Responsive Design](phases/00-setup-and-tooling/09-data-management/) | Build | CSS |
-| 10 | [Accessibility Foundations](phases/00-setup-and-tooling/10-terminal-and-shell/) | Learn | — |
-| 11 | [Debugging & Profiling](phases/00-setup-and-tooling/11-linux-for-ai/) | Build | TypeScript |
-| 12 | [Deployment & Preview Workflow](phases/00-setup-and-tooling/12-debugging-and-profiling/) | Build | TypeScript |
+| 01 | [The Modern Development Environment](phases/00-frontend-setup-and-tooling/01-modern-development-environment/) | Build | Shell |
+| 02 | [OS, Shell & Workflow Automation](phases/00-frontend-setup-and-tooling/02-os-shell-workflow-automation/) | Build | Shell |
+| 03 | [IDE Mastery with VS Code](phases/00-frontend-setup-and-tooling/03-ide-mastery-with-vs-code/) | Build | TypeScript |
+| 04 | [Essential Extensions & Workspace Hygiene](phases/00-frontend-setup-and-tooling/04-essential-extensions-workspace-hygiene/) | Build | TypeScript |
+| 05 | [Node.js Runtimes & Version Management](phases/00-frontend-setup-and-tooling/05-node-runtimes-version-management/) | Build | JavaScript |
+| 06 | [pnpm and Dependency Management](phases/00-frontend-setup-and-tooling/06-pnpm-dependency-management/) | Build | JavaScript |
+| 07 | [Advanced Git Workflow](phases/00-frontend-setup-and-tooling/07-advanced-git-workflow/) | Learn | — |
+| 08 | [Conventional Commits & Git Hooks](phases/00-frontend-setup-and-tooling/08-conventional-commits-git-hooks/) | Build | Git |
+| 09 | [SWC, Babel & Transpilation](phases/00-frontend-setup-and-tooling/09-swc-babel-transpilation/) | Build | TypeScript |
+| 10 | [TypeScript Configuration & Path Aliases](phases/00-frontend-setup-and-tooling/10-typescript-configuration-path-aliases/) | Build | TypeScript |
+| 11 | [Build Optimization & Asset Pipelines](phases/00-frontend-setup-and-tooling/11-build-optimization-asset-pipelines/) | Build | JavaScript |
+| 12 | [Deployment & Preview Workflow](phases/00-frontend-setup-and-tooling/12-deployment-preview-workflow/) | Build | TypeScript |
 
 <details id="phase-1">
 <summary><b>Phase 1 — HTML & Semantics</b> &nbsp;<code>22 lessons</code>&nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>

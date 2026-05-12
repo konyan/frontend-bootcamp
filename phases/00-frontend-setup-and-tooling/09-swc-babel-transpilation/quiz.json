@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What does a transpiler do?",
+      "options": [
+        "Converts modern syntax into another version of JavaScript",
+        "Stores browser bookmarks",
+        "Hosts static sites",
+        "Creates Git branches"
+      ],
+      "correct": 0,
+      "explanation": "Transpilers rewrite code into output that is easier for target environments to run."
+    },
+    {
+      "stage": "pre",
+      "question": "Why is SWC popular in Next.js?",
+      "options": [
+        "It is a fast compiler for modern frontend builds",
+        "It replaces React entirely",
+        "It is a database layer",
+        "It only works with Python"
+      ],
+      "correct": 0,
+      "explanation": "SWC is used because it offers very fast compilation for modern JavaScript and TypeScript workflows."
+    },
+    {
+      "stage": "post",
+      "question": "What do source maps help with?",
+      "options": [
+        "Debugging compiled code by pointing back to the original source",
+        "Creating browser cookies",
+        "Running Git hooks faster",
+        "Rewriting commit messages"
+      ],
+      "correct": 0,
+      "explanation": "Source maps map generated code back to the original files so debugging stays practical."
+    },
+    {
+      "stage": "post",
+      "question": "What is the difference between transpiling and bundling?",
+      "options": [
+        "Transpiling rewrites syntax; bundling combines files and assets",
+        "Bundling rewrites syntax; transpiling creates images",
+        "They are the same thing",
+        "Neither affects frontend builds"
+      ],
+      "correct": 0,
+      "explanation": "Transpiling and bundling are related but separate steps in the build pipeline."
+    }
+  ]
+}

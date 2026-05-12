@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What is the main purpose of a preview deployment?",
+      "options": [
+        "To see the app in a realistic environment before merging",
+        "To replace local development entirely",
+        "To skip testing",
+        "To make Git branches invisible"
+      ],
+      "correct": 0,
+      "explanation": "Preview deployments help you validate changes in an environment closer to production."
+    },
+    {
+      "stage": "pre",
+      "question": "Why are environment variables important in deployment?",
+      "options": [
+        "They store build and runtime values outside the code",
+        "They delete unused CSS",
+        "They rewrite commit history",
+        "They compile source maps"
+      ],
+      "correct": 0,
+      "explanation": "Environment variables let the same code behave differently across environments without hardcoding secrets or URLs."
+    },
+    {
+      "stage": "post",
+      "question": "What should you do before trusting a deployment?",
+      "options": [
+        "Run a local production build or preview first",
+        "Assume the browser will fix it",
+        "Delete the lockfile",
+        "Skip the environment check"
+      ],
+      "correct": 0,
+      "explanation": "A local build/preview catches deployment issues earlier and with less noise."
+    },
+    {
+      "stage": "post",
+      "question": "Why do preview URLs help teams?",
+      "options": [
+        "They make it easier to review real changes before merge",
+        "They replace code reviews",
+        "They prevent lint errors",
+        "They eliminate the need for branches"
+      ],
+      "correct": 0,
+      "explanation": "Preview URLs keep feedback concrete by showing the actual running app."
+    }
+  ]
+}

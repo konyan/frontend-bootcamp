@@ -1,0 +1,64 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Why do frontend projects benefit from a workspace-specific setup?",
+      "options": [
+        "It makes JavaScript run faster automatically",
+        "It prevents every project from needing its own Git repository",
+        "It keeps editor, runtime, and package settings consistent per project",
+        "It removes the need for npm and pnpm"
+      ],
+      "correct": 2,
+      "explanation": "A workspace-specific setup keeps formatting, linting, runtime versions, and tool settings consistent for that project instead of leaking across unrelated work."
+    },
+    {
+      "stage": "pre",
+      "question": "What is the main job of a shell alias?",
+      "options": [
+        "Encrypt environment variables",
+        "Shorten or customize frequently used commands",
+        "Compile TypeScript to JavaScript",
+        "Replace Git branches with tags"
+      ],
+      "correct": 1,
+      "explanation": "Aliases let you turn long or repetitive commands into shorter ones, which reduces friction in daily frontend work."
+    },
+    {
+      "stage": "post",
+      "question": "Which extension is most directly used for code formatting in frontend projects?",
+      "options": [
+        "Prettier",
+        "Tailwind CSS IntelliSense",
+        "GitLens",
+        "Live Server"
+      ],
+      "correct": 0,
+      "explanation": "Prettier handles automatic formatting and is the common baseline for consistent frontend code style."
+    },
+    {
+      "stage": "post",
+      "question": "Why are Node version managers like fnm or nvm useful?",
+      "options": [
+        "They automatically convert CSS into JavaScript",
+        "They keep different projects on different Node.js versions",
+        "They replace Git with a faster protocol",
+        "They generate production databases"
+      ],
+      "correct": 1,
+      "explanation": "Version managers let you pin the Node version per project so one app does not break another."
+    },
+    {
+      "stage": "post",
+      "question": "What is the most useful reason to set editor options in .vscode/settings.json?",
+      "options": [
+        "It makes the repository private",
+        "It ensures everyone on the team gets the same workspace behavior",
+        "It removes the need for package.json",
+        "It turns JavaScript into TypeScript"
+      ],
+      "correct": 1,
+      "explanation": "Workspace settings keep formatting, indentation, and language tooling aligned for everyone who opens the project."
+    }
+  ]
+}

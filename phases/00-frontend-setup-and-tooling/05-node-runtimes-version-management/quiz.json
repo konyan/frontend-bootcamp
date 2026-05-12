@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Why use a Node version manager?",
+      "options": [
+        "To compile CSS faster",
+        "To keep projects on the runtime versions they expect",
+        "To replace Git hooks",
+        "To generate HTML templates"
+      ],
+      "correct": 1,
+      "explanation": "Version managers let you isolate runtime versions by project."
+    },
+    {
+      "stage": "pre",
+      "question": "What is a common advantage of Bun in frontend work?",
+      "options": [
+        "It is a browser-only language",
+        "It can offer fast runtime and tooling workflows",
+        "It replaces the need for TypeScript",
+        "It removes package managers entirely"
+      ],
+      "correct": 1,
+      "explanation": "Bun is often used for fast execution and built-in tooling, though Node remains the most common baseline."
+    },
+    {
+      "stage": "post",
+      "question": "What should you check before debugging a dependency issue?",
+      "options": [
+        "The active Node version",
+        "The browser theme",
+        "Your Git branch color",
+        "The number of tabs open"
+      ],
+      "correct": 0,
+      "explanation": "Many install and runtime problems come from the wrong Node version being active."
+    },
+    {
+      "stage": "post",
+      "question": "Why document the expected runtime in the project?",
+      "options": [
+        "So the repo can be opened without any build tools",
+        "So teammates and CI use the same version",
+        "So CSS variables stop working",
+        "So Git stops tracking files"
+      ],
+      "correct": 1,
+      "explanation": "Documenting the runtime reduces surprises for teammates and automation."
+    }
+  ]
+}

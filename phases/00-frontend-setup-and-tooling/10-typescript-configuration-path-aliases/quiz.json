@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What does strict TypeScript configuration help with?",
+      "options": [
+        "Catching more mistakes at compile time",
+        "Making CSS variables work faster",
+        "Replacing Git",
+        "Turning HTML into SVG"
+      ],
+      "correct": 0,
+      "explanation": "Strict flags increase the amount of feedback TypeScript gives you before code ships."
+    },
+    {
+      "stage": "pre",
+      "question": "What is a path alias useful for?",
+      "options": [
+        "Shortening and stabilizing import paths",
+        "Compressing images",
+        "Deploying apps",
+        "Creating commit messages"
+      ],
+      "correct": 0,
+      "explanation": "Path aliases like @/components/Button keep imports clean and easier to move later."
+    },
+    {
+      "stage": "post",
+      "question": "What does noImplicitAny help prevent?",
+      "options": [
+        "Untyped values sneaking into the codebase silently",
+        "Browser rendering errors only",
+        "Git merge conflicts",
+        "Package install failures"
+      ],
+      "correct": 0,
+      "explanation": "noImplicitAny forces you to be explicit instead of letting values become any by accident."
+    },
+    {
+      "stage": "post",
+      "question": "Why keep tsconfig aligned across a team?",
+      "options": [
+        "So everyone gets the same compiler behavior",
+        "So CSS modules stop working",
+        "So Git hooks can be skipped",
+        "So the browser caches TypeScript"
+      ],
+      "correct": 0,
+      "explanation": "Shared compiler settings help the team avoid surprise differences between machines."
+    }
+  ]
+}

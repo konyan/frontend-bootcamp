@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What does git rebase do?",
+      "options": [
+        "Moves commits onto a new base commit",
+        "Deletes your repository history",
+        "Creates a production deployment",
+        "Converts merge commits into tags"
+      ],
+      "correct": 0,
+      "explanation": "Rebase rewrites the branch so its commits appear on top of a different base."
+    },
+    {
+      "stage": "pre",
+      "question": "When is cherry-pick useful?",
+      "options": [
+        "When you want one specific commit on another branch",
+        "When you want to delete a remote",
+        "When you need to format code",
+        "When you want to replace npm with pnpm"
+      ],
+      "correct": 0,
+      "explanation": "Cherry-pick copies a single commit onto the current branch."
+    },
+    {
+      "stage": "post",
+      "question": "What should you do after a conflict resolution?",
+      "options": [
+        "Assume it is correct and move on",
+        "Review the diff to confirm the result",
+        "Delete the branch immediately",
+        "Skip the test suite"
+      ],
+      "correct": 1,
+      "explanation": "Reviewing the diff helps confirm you did not accidentally drop changes while resolving the conflict."
+    },
+    {
+      "stage": "post",
+      "question": "What is git reflog useful for?",
+      "options": [
+        "Recovering references to recent HEAD movements",
+        "Rebuilding node_modules",
+        "Formatting Markdown tables",
+        "Generating release notes automatically"
+      ],
+      "correct": 0,
+      "explanation": "Reflog tracks recent positions of HEAD and can help recover from mistakes."
+    }
+  ]
+}

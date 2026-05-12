@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What is tree-shaking?",
+      "options": [
+        "Removing unused code from a production bundle",
+        "A Git reset strategy",
+        "A browser accessibility feature",
+        "A way to rename commits"
+      ],
+      "correct": 0,
+      "explanation": "Tree-shaking helps keep the final bundle smaller by excluding code that is never used."
+    },
+    {
+      "stage": "pre",
+      "question": "What does code splitting do?",
+      "options": [
+        "Breaks a large bundle into smaller pieces loaded on demand",
+        "Merges CSS and JavaScript into one file",
+        "Creates Git patches",
+        "Replaces TypeScript compilation"
+      ],
+      "correct": 0,
+      "explanation": "Code splitting helps you avoid loading everything up front."
+    },
+    {
+      "stage": "post",
+      "question": "Why do frontend teams care about asset pipelines?",
+      "options": [
+        "They affect how images, fonts, and code are delivered to users",
+        "They only matter for backend APIs",
+        "They replace package managers",
+        "They are unrelated to performance"
+      ],
+      "correct": 0,
+      "explanation": "Asset handling is part of build performance and production delivery."
+    },
+    {
+      "stage": "post",
+      "question": "What is one benefit of lazy loading?",
+      "options": [
+        "Smaller initial download and faster startup",
+        "More Git conflicts",
+        "Slower routing",
+        "Fewer source files"
+      ],
+      "correct": 0,
+      "explanation": "Lazy loading delays non-essential work until the user actually needs it."
+    }
+  ]
+}

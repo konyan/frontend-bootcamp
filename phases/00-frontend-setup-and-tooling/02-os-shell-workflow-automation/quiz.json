@@ -1,0 +1,52 @@
+{
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What does the PATH environment variable control?",
+      "options": [
+        "The order your shell searches for executables",
+        "The font family used in your editor",
+        "Which Git branch is active",
+        "Whether CSS variables are supported"
+      ],
+      "correct": 0,
+      "explanation": "PATH tells the shell where to look when you type a command like node, pnpm, or git."
+    },
+    {
+      "stage": "pre",
+      "question": "What is a shell function useful for?",
+      "options": [
+        "Rewriting TypeScript at runtime",
+        "Bundling assets for production",
+        "Wrapping a multi-step command sequence",
+        "Replacing package-lock.json"
+      ],
+      "correct": 2,
+      "explanation": "Shell functions are useful when one command is really a small workflow made of several steps."
+    },
+    {
+      "stage": "post",
+      "question": "Where should temporary project environment variables usually live?",
+      "options": [
+        "In the repo root README only",
+        "In a checked-in .env.example or workspace settings file",
+        "Inside your browser cache",
+        "Inside the package lock file"
+      ],
+      "correct": 1,
+      "explanation": "Project-specific values should be documented and shared through workspace files or an example env file, not copied by hand into every terminal session."
+    },
+    {
+      "stage": "post",
+      "question": "Why do dotfiles matter in frontend work?",
+      "options": [
+        "They are a place to store image assets",
+        "They make your shell and editor reproducible across machines",
+        "They replace the package manager",
+        "They compile JSX into HTML"
+      ],
+      "correct": 1,
+      "explanation": "Dotfiles keep your core tools predictable, which matters when you move between projects or machines."
+    }
+  ]
+}
