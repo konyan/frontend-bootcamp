@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Structure & Metadata | HTML & Semantics</title>
+  <meta name="description" content="Complete guide to HTML head section: meta tags, SEO, social sharing, and PWA configuration.">
+  <meta name="keywords" content="HTML, head section, meta tags, SEO, Open Graph, PWA">
+  
+  <meta property="og:title" content="Document Structure & Metadata">
+  <meta property="og:description" content="Master the HTML head section for SEO, social sharing, and browser optimization.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://example.com/html-metadata">
+  <meta property="og:image" content="https://example.com/og-image.png">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Document Structure & Metadata">
+  <meta name="twitter:description" content="Master the HTML head section for SEO and social sharing.">
+  
+  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50' font-size='50' fill='%23333'>🏷️</text></svg>">
+  <meta name="theme-color" content="#2563eb">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    
+    main {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #667eea;
+      margin-top: 0;
+    }
+    
+    code {
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .meta-display {
+      background: #f9fafb;
+      border-left: 4px solid #667eea;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+    
+    .meta-display dt {
+      font-weight: bold;
+      color: #667eea;
+      margin-top: 0.5rem;
+    }
+    
+    .meta-display dd {
+      margin-left: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🏷️ Document Structure & Metadata</h1>
+    
+    <p>This page demonstrates proper HTML head configuration for:</p>
+    <ul>
+      <li>Character encoding (UTF-8)</li>
+      <li>Responsive viewport</li>
+      <li>SEO meta tags</li>
+      <li>Open Graph tags for social sharing</li>
+      <li>Twitter Card tags</li>
+      <li>Favicon and theme color</li>
+    </ul>
+    
+    <section>
+      <h2>Head Section Breakdown</h2>
+      
+      <div class="meta-display">
+        <h3>Character Encoding</h3>
+        <code>&lt;meta charset="UTF-8"&gt;</code>
+        <p>Must be first in head. Tells browser to interpret text as UTF-8 (supports all languages).</p>
+      </div>
+      
+      <div class="meta-display">
+        <h3>Responsive Viewport</h3>
+        <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>
+        <p>Critical for mobile. Tells browser to scale content to device width.</p>
+      </div>
+      
+      <div class="meta-display">
+        <h3>SEO Tags</h3>
+        <dl>
+          <dt>&lt;title&gt;</dt>
+          <dd>Shows in browser tab and search results. Keep under 60 characters.</dd>
+          
+          <dt>&lt;meta name="description"&gt;</dt>
+          <dd>Shows in search results. Keep under 160 characters. Include target keywords.</dd>
+          
+          <dt>&lt;meta name="keywords"&gt;</dt>
+          <dd>Hints to search engines. Less important now, but still useful.</dd>
+        </dl>
+      </div>
+      
+      <div class="meta-display">
+        <h3>Open Graph Tags</h3>
+        <p>Control how page appears when shared on Facebook, LinkedIn, Slack, Discord, etc.</p>
+        <dl>
+          <dt>og:title</dt>
+          <dd>Title shown in preview</dd>
+          
+          <dt>og:description</dt>
+          <dd>Description shown in preview</dd>
+          
+          <dt>og:image</dt>
+          <dd>Image shown in preview (1200x630px recommended)</dd>
+          
+          <dt>og:url</dt>
+          <dd>Canonical URL of the page</dd>
+          
+          <dt>og:type</dt>
+          <dd>Content type: article, website, video, etc.</dd>
+        </dl>
+      </div>
+      
+      <div class="meta-display">
+        <h3>Brand & Browser</h3>
+        <dl>
+          <dt>favicon</dt>
+          <dd>Small icon shown in browser tab. Improves brand recognition.</dd>
+          
+          <dt>theme-color</dt>
+          <dd>Color for browser UI and mobile app shortcuts.</dd>
+        </dl>
+      </div>
+    </section>
+    
+    <section>
+      <h2>Why This Matters</h2>
+      
+      <h3>SEO Impact</h3>
+      <p>
+        Proper head configuration directly affects search engine rankings. Missing or poor 
+        metadata reduces visibility. Good metadata:
+      </p>
+      <ul>
+        <li>Improves click-through rate from search results</li>
+        <li>Helps search engines understand page content</li>
+        <li>Supports rich snippets (ratings, reviews, etc.)</li>
+      </ul>
+      
+      <h3>Social Sharing</h3>
+      <p>
+        When someone shares your page, Open Graph and Twitter tags control the preview.
+        A professional, branded preview gets more clicks than a generic one.
+      </p>
+      
+      <h3>Mobile UX</h3>
+      <p>
+        The viewport meta tag and theme-color make your site look professional on mobile.
+        Without it, pages render zoomed out and are hard to read.
+      </p>
+    </section>
+    
+    <section>
+      <h2>Quick Checklist</h2>
+      
+      <ul>
+        <li>✅ UTF-8 charset (first in head)</li>
+        <li>✅ Viewport meta tag</li>
+        <li>✅ Meaningful title (under 60 characters)</li>
+        <li>✅ Descriptive meta description (under 160 characters)</li>
+        <li>✅ Open Graph tags (og:title, og:description, og:image)</li>
+        <li>✅ Twitter Card tags (if shared on Twitter)</li>
+        <li>✅ Favicon</li>
+        <li>✅ Theme color for mobile</li>
+        <li>✅ Valid HTML (run through W3C validator)</li>
+      </ul>
+    </section>
+    
+    <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.9em; color: #666;">
+      <p>Inspect this page's source (&lt;head&gt; section) to see all the meta tags in action.</p>
+    </footer>
+  </main>
+</body>
+</html>

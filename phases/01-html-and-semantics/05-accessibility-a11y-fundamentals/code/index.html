@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility (A11y) Fundamentals | HTML & Semantics</title>
+  <meta name="description" content="Build inclusive websites with proper alt text, ARIA, keyboard accessibility, and color contrast.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f9fafb;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      skip-link-target: main;
+    }
+    
+    /* Skip link for keyboard users */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: #fff;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+    }
+    
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    nav {
+      background: #fff;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 2rem;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    
+    nav a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    nav a:hover,
+    nav a:focus {
+      text-decoration: underline;
+    }
+    
+    nav a:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+    
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    section {
+      background: white;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      color: #764ba2;
+      margin: 1.5rem 0 0.75rem 0;
+    }
+    
+    p {
+      margin-bottom: 1rem;
+    }
+    
+    code {
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+    
+    .contrast-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .contrast-box {
+      padding: 2rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .good-contrast {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #16a34a;
+    }
+    
+    .good-contrast-alt {
+      background: #ffffff;
+      color: #595959;
+      border: 2px solid #16a34a;
+    }
+    
+    .bad-contrast {
+      background: #f0f0f0;
+      color: #999999;
+      border: 2px solid #dc2626;
+    }
+    
+    .contrast-label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    .contrast-ratio {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+    
+    .accessibility-checklist {
+      background: #f0f9ff;
+      border-left: 4px solid #667eea;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+    
+    .accessibility-checklist h4 {
+      color: #667eea;
+      margin-bottom: 0.75rem;
+    }
+    
+    .accessibility-checklist ul {
+      list-style: none;
+      margin-left: 0;
+    }
+    
+    .accessibility-checklist li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    
+    .accessibility-checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #16a34a;
+      font-weight: bold;
+    }
+    
+    .example-section {
+      background: #f9fafb;
+      border-left: 4px solid #667eea;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    
+    .aria-demo {
+      background: #f9fafb;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+    }
+    
+    button:hover {
+      background: #5568d3;
+    }
+    
+    button:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+    
+    .alert {
+      background: #fee2e2;
+      border: 1px solid #dc2626;
+      border-left: 4px solid #dc2626;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    
+    .alert::before {
+      content: "⚠️ ";
+      font-weight: bold;
+    }
+    
+    .success {
+      background: #dbeafe;
+      border: 1px solid #0284c7;
+      border-left: 4px solid #0284c7;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    
+    .success::before {
+      content: "✓ ";
+      font-weight: bold;
+      color: #0284c7;
+    }
+    
+    footer {
+      background: #333;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    
+    table th {
+      background: #f5f5f5;
+      font-weight: bold;
+    }
+    
+    ul {
+      margin-left: 1.5rem;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+  
+  <header>
+    <h1>♿ Accessibility (A11y) Fundamentals</h1>
+    <p>Build inclusive websites that work for everyone</p>
+  </header>
+  
+  <nav aria-label="Main navigation">
+    <a href="#alt-text">Alt Text</a>
+    <a href="#semantic">Semantic HTML</a>
+    <a href="#keyboard">Keyboard Access</a>
+    <a href="#contrast">Color Contrast</a>
+    <a href="#aria">ARIA</a>
+    <a href="#checklist">Checklist</a>
+  </nav>
+  
+  <main id="main">
+    <!-- Alt Text Section -->
+    <section id="alt-text">
+      <h2>Alt Text: The Foundation</h2>
+      
+      <p>
+        Alt text describes images for screen reader users and provides context when 
+        images fail to load. It's the single most important accessibility feature.
+      </p>
+      
+      <h3>Good Alt Text Examples</h3>
+      
+      <figure style="margin: 1rem 0; padding: 1rem; background: #f9fafb; border-radius: 4px;">
+        <img 
+          src="https://via.placeholder.com/400x300?text=Team+Collaboration"
+          alt="Six diverse team members collaborating around a laptop in a modern office"
+          style="width: 100%; max-width: 400px; border-radius: 4px; margin-bottom: 0.5rem;"
+        >
+        <figcaption>
+          <strong>Good alt text:</strong> Specific, descriptive, tells the story.
+        </figcaption>
+      </figure>
+      
+      <div class="success">
+        ✓ Concise and descriptive (usually under 125 characters)
+      </div>
+      
+      <div class="success">
+        ✓ Describes purpose, not appearance ("Chart showing Q1 sales" not "Bar graph")
+      </div>
+      
+      <div class="success">
+        ✓ Doesn't repeat surrounding text
+      </div>
+      
+      <div class="alert">
+        ✗ Empty alt text for decorative images: <code>alt=""</code>
+      </div>
+      
+      <div class="alert">
+        ✗ Starting with "Image of..." (screen readers already announce it's an image)
+      </div>
+      
+      <h3>Alt Text Checklist</h3>
+      
+      <table>
+        <tr>
+          <th>Image Type</th>
+          <th>Alt Text</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td>Informative</td>
+          <td>Describe content</td>
+          <td><code>alt="Sunrise over the ocean with pink clouds"</code></td>
+        </tr>
+        <tr>
+          <td>Decorative</td>
+          <td>Empty string</td>
+          <td><code>alt=""</code></td>
+        </tr>
+        <tr>
+          <td>Data/Chart</td>
+          <td>Summary + link to data</td>
+          <td><code>alt="Sales by region chart. See table below for data."</code></td>
+        </tr>
+        <tr>
+          <td>Link/Button</td>
+          <td>Describe destination</td>
+          <td><code>alt="Buy premium plan - save 50%"</code></td>
+        </tr>
+        <tr>
+          <td>Text in image</td>
+          <td>Include the text</td>
+          <td><code>alt="Poster: Web Accessibility Workshop, May 15"</code></td>
+        </tr>
+      </table>
+    </section>
+    
+    <!-- Semantic HTML Section -->
+    <section id="semantic">
+      <h2>Semantic HTML: Use Proper Tags</h2>
+      
+      <p>
+        Semantic HTML is the foundation of accessibility. Use tags that describe meaning, 
+        and ARIA becomes unnecessary.
+      </p>
+      
+      <h3>Semantic vs. ARIA</h3>
+      
+      <div class="example-section">
+        <strong>❌ Bad: Div with ARIA (avoid this)</strong>
+        <pre><code>&lt;div role="button" onclick="save()"&gt;Save&lt;/div&gt;</code></pre>
+        <p>Screen readers announce "button" but it's not actually a button. Keyboard users can't access it.</p>
+      </div>
+      
+      <div class="example-section">
+        <strong>✅ Good: Semantic HTML (do this)</strong>
+        <pre><code>&lt;button onclick="save()"&gt;Save&lt;/button&gt;</code></pre>
+        <p>Browser handles everything: keyboard, screen reader, focus management.</p>
+      </div>
+      
+      <h3>Semantic Tags for Structure</h3>
+      
+      <ul>
+        <li><code>&lt;header&gt;</code>: Page or section header</li>
+        <li><code>&lt;nav&gt;</code>: Navigation menu</li>
+        <li><code>&lt;main&gt;</code>: Primary content (use once per page)</li>
+        <li><code>&lt;article&gt;</code>: Self-contained content</li>
+        <li><code>&lt;section&gt;</code>: Thematic grouping</li>
+        <li><code>&lt;aside&gt;</code>: Sidebar or related content</li>
+        <li><code>&lt;footer&gt;</code>: Page footer</li>
+      </ul>
+      
+      <p style="margin-top: 1rem;">
+        <strong>Rule:</strong> Always use semantic HTML first. 
+        Only use ARIA to clarify or enhance, never to replace semantic HTML.
+      </p>
+    </section>
+    
+    <!-- Keyboard Accessibility -->
+    <section id="keyboard">
+      <h2>Keyboard Accessibility</h2>
+      
+      <p>
+        Many users navigate with just a keyboard (mobility impairments, power users, 
+        screen reader users). Your site must work perfectly without a mouse.
+      </p>
+      
+      <h3>Test Keyboard Navigation</h3>
+      
+      <p>
+        Try using this page with <strong>only the Tab key</strong> (and Shift+Tab to go backward). 
+        Can you:
+      </p>
+      
+      <ul>
+        <li>Navigate to all interactive elements?</li>
+        <li>See a visible focus indicator?</li>
+        <li>Activate buttons and links?</li>
+        <li>Tab out of all sections (no keyboard trap)?</li>
+      </ul>
+      
+      <h3>Focus Management</h3>
+      
+      <p>
+        Focus indicates which element is currently active (will receive keyboard input). 
+        Good focus management requires:
+      </p>
+      
+      <ul>
+        <li><strong>Visible focus indicator:</strong> Don't remove the outline</li>
+        <li><strong>Logical tab order:</strong> Tab through elements in reading order</li>
+        <li><strong>No keyboard traps:</strong> Users can always tab out</li>
+        <li><strong>Focus management:</strong> Move focus when opening modals or dynamic content</li>
+      </ul>
+      
+      <div class="example-section">
+        <strong>Good: Visible focus indicator</strong>
+        <pre><code>button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}</code></pre>
+      </div>
+      
+      <div class="alert">
+        ✗ <strong>Bad:</strong> Removing outline without replacing it
+        <pre><code>button:focus {
+  outline: none; /* Never do this without replacement */
+}</code></pre>
+      </div>
+    </section>
+    
+    <!-- Color Contrast Section -->
+    <section id="contrast">
+      <h2>Color Contrast</h2>
+      
+      <p>
+        Color contrast matters for users with low vision or color blindness. 
+        Text must have sufficient contrast with its background.
+      </p>
+      
+      <h3>WCAG Contrast Ratios</h3>
+      
+      <table>
+        <tr>
+          <th>Level</th>
+          <th>Regular Text</th>
+          <th>Large Text (18pt+)</th>
+        </tr>
+        <tr>
+          <td>AA (Standard)</td>
+          <td>4.5:1</td>
+          <td>3:1</td>
+        </tr>
+        <tr>
+          <td>AAA (Enhanced)</td>
+          <td>7:1</td>
+          <td>4.5:1</td>
+        </tr>
+      </table>
+      
+      <h3>Visual Examples</h3>
+      
+      <div class="contrast-demo">
+        <div class="good-contrast">
+          <div class="contrast-label">✓ Good: 21:1</div>
+          <p>Black on white</p>
+          <p style="font-size: 0.9rem; margin: 0;">
+            Most readable
+          </p>
+          <div class="contrast-ratio">WCAG AAA</div>
+        </div>
+        
+        <div class="good-contrast-alt">
+          <div class="contrast-label">✓ Good: 7:1</div>
+          <p>Dark gray on white</p>
+          <p style="font-size: 0.9rem; margin: 0;">
+            Still accessible
+          </p>
+          <div class="contrast-ratio">WCAG AAA</div>
+        </div>
+        
+        <div class="bad-contrast">
+          <div class="contrast-label">✗ Fail: 1.5:1</div>
+          <p>Light gray on white</p>
+          <p style="font-size: 0.9rem; margin: 0;">
+            Hard to read
+          </p>
+          <div class="contrast-ratio">Below AA</div>
+        </div>
+      </div>
+      
+      <h3>Beyond Color</h3>
+      
+      <p>Never use color alone to convey information:</p>
+      
+      <div class="alert">
+        ✗ Red input border alone = error (what about colorblind users?)
+      </div>
+      
+      <div class="success">
+        ✓ Red border + error icon + error message = clear error indication
+      </div>
+    </section>
+    
+    <!-- ARIA Section -->
+    <section id="aria">
+      <h2>ARIA (Accessibility Rich Internet Applications)</h2>
+      
+      <p>
+        ARIA enhances HTML for complex interactions. But remember: 
+        <strong>First use semantic HTML, then use ARIA to clarify or enhance.</strong>
+      </p>
+      
+      <h3>Common ARIA Attributes</h3>
+      
+      <table>
+        <tr>
+          <th>Attribute</th>
+          <th>Purpose</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td><code>aria-label</code></td>
+          <td>Label element when visible text unavailable</td>
+          <td><code>&lt;button aria-label="Close menu"&gt;×&lt;/button&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>aria-describedby</code></td>
+          <td>Link to description text</td>
+          <td><code>&lt;input aria-describedby="help"&gt;&lt;p id="help"&gt;...&lt;/p&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>aria-expanded</code></td>
+          <td>Indicate if collapsible content is open</td>
+          <td><code>&lt;button aria-expanded="false"&gt;Show More&lt;/button&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>aria-hidden</code></td>
+          <td>Hide decorative elements from screen readers</td>
+          <td><code>&lt;div aria-hidden="true"&gt;→&lt;/div&gt;</code></td>
+        </tr>
+        <tr>
+          <td><code>aria-live</code></td>
+          <td>Announce dynamic content changes</td>
+          <td><code>&lt;div aria-live="polite"&gt;...&lt;/div&gt;</code></td>
+        </tr>
+      </table>
+      
+      <h3>Interactive Example: Accessible Menu Button</h3>
+      
+      <div class="aria-demo">
+        <button 
+          id="menu-button"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="menu"
+        >
+          Menu
+        </button>
+        
+        <ul id="menu" role="menu" hidden>
+          <li><a href="#profile">Profile</a></li>
+          <li><a href="#settings">Settings</a></li>
+          <li><a href="#logout">Logout</a></li>
+        </ul>
+      </div>
+      
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+        Attributes: <code>aria-haspopup</code>, <code>aria-expanded</code>, <code>aria-controls</code>
+      </p>
+      
+      <script>
+        const menuButton = document.getElementById('menu-button');
+        const menu = document.getElementById('menu');
+        
+        menuButton.addEventListener('click', () => {
+          const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+          menuButton.setAttribute('aria-expanded', !isOpen);
+          menu.hidden = isOpen;
+        });
+      </script>
+    </section>
+    
+    <!-- Accessibility Checklist -->
+    <section id="checklist">
+      <h2>Complete Accessibility Checklist</h2>
+      
+      <div class="accessibility-checklist">
+        <h4>Images & Media</h4>
+        <ul>
+          <li>All images have meaningful alt text</li>
+          <li>Decorative images use <code>alt=""</code></li>
+          <li>Video has captions and descriptions</li>
+          <li>Audio has transcripts</li>
+        </ul>
+      </div>
+      
+      <div class="accessibility-checklist">
+        <h4>Structure & Navigation</h4>
+        <ul>
+          <li>Heading hierarchy is logical (no skipped levels)</li>
+          <li>Use semantic HTML: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, etc.</li>
+          <li>Skip link to main content provided</li>
+          <li>Landmark regions properly defined</li>
+        </ul>
+      </div>
+      
+      <div class="accessibility-checklist">
+        <h4>Forms</h4>
+        <ul>
+          <li>All inputs have associated <code>&lt;label&gt;</code> tags</li>
+          <li>Required fields marked as required</li>
+          <li>Error messages clear and associated with fields</li>
+          <li>Form is fully keyboard accessible</li>
+        </ul>
+      </div>
+      
+      <div class="accessibility-checklist">
+        <h4>Color & Contrast</h4>
+        <ul>
+          <li>Text contrast at least 4.5:1 (AA standard)</li>
+          <li>Color not the only indicator (include text/icons)</li>
+          <li>Focus indicators clearly visible</li>
+          <li>No flashing or seizure-inducing content</li>
+        </ul>
+      </div>
+      
+      <div class="accessibility-checklist">
+        <h4>Keyboard & Interaction</h4>
+        <ul>
+          <li>All interactive elements keyboard accessible</li>
+          <li>Logical tab order</li>
+          <li>No keyboard traps</li>
+          <li>Focus management in modals/dialogs</li>
+        </ul>
+      </div>
+      
+      <div class="accessibility-checklist">
+        <h4>Testing</h4>
+        <ul>
+          <li>Tested with screen reader (NVDA, JAWS, VoiceOver)</li>
+          <li>Lighthouse accessibility audit: 90+</li>
+          <li>W3C HTML Validator: no errors</li>
+          <li>Browser testing: Chrome, Firefox, Safari, Edge</li>
+        </ul>
+      </div>
+      
+      <h3 style="margin-top: 2rem; color: #667eea;">Tools for Accessibility Testing</h3>
+      
+      <ul>
+        <li><strong>axe DevTools:</strong> Automated accessibility checks</li>
+        <li><strong>WAVE:</strong> Web Accessibility Evaluation Tool</li>
+        <li><strong>Lighthouse:</strong> Built into Chrome DevTools</li>
+        <li><strong>NVDA / JAWS:</strong> Screen readers for testing</li>
+        <li><strong>Color Contrast Analyzer:</strong> Check contrast ratios</li>
+        <li><strong>W3C HTML Validator:</strong> Semantic HTML validation</li>
+      </ul>
+    </section>
+  </main>
+  
+  <footer>
+    <p>♿ Accessibility is not an afterthought—it's a core design principle.</p>
+    <p>&copy; 2024 HTML & Semantics. Built for everyone.</p>
+  </footer>
+</body>
+</html>

@@ -25,18 +25,15 @@ Total estimated time: ~300 hours, at your own pace.
 | 11 | Build Optimization & Asset Pipelines | ⬚ | ~75 min |
 | 12 | Deployment & Preview Workflow | ⬚ | ~60 min |
 
-## Phase 1: HTML & Semantics — ⬚ (~10 hours)
+## Phase 1: HTML & Semantics — ⬚ (~4.5 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | HTML Document Structure | ⬚ | ~45 min |
-| 02 | Semantic HTML5 Elements | ⬚ | ~60 min |
-| 03 | Forms & Input Elements | ⬚ | ~60 min |
-| 04 | Accessibility Fundamentals (a11y) | ⬚ | ~45 min |
-| 05 | ARIA & Accessible Markup | ⬚ | ~60 min |
-| 06 | HTML Best Practices | ⬚ | ~45 min |
-| 07 | Microdata & Schema.org | ⬚ | ~45 min |
-| 08 | Build Your First HTML Page | ⬚ | ~90 min |
+| 01 | Document Structure & Metadata | ⬚ | ~45 min |
+| 02 | Semantic HTML5 Elements | ⬚ | ~50 min |
+| 03 | Accessible Forms & User Input | ⬚ | ~55 min |
+| 04 | Interactive & Multimedia Elements | ⬚ | ~60 min |
+| 05 | Accessibility (A11y) Fundamentals | ⬚ | ~65 min |
 
 ## Phase 2: CSS Fundamentals — ⬚ (~12 hours)
 

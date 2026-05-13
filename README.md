@@ -258,33 +258,16 @@ Twenty phases. Click any phase to expand its lesson list.
 | 12 | [Deployment & Preview Workflow](phases/00-frontend-setup-and-tooling/12-deployment-preview-workflow/) | Build | TypeScript |
 
 <details id="phase-1">
-<summary><b>Phase 1 — HTML & Semantics</b> &nbsp;<code>22 lessons</code>&nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
+<summary><b>Phase 1 — HTML & Semantics</b> &nbsp;<code>5 lessons</code>&nbsp; <em>Document structure, semantic HTML, forms, and accessibility fundamentals.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [Linear Algebra Intuition](phases/01-math-foundations/01-linear-algebra-intuition/) | Learn | Python, Julia |
-| 02 | [Vectors, Matrices & Operations](phases/01-math-foundations/02-vectors-matrices-operations/) | Build | Python, Julia |
-| 03 | [Matrix Transformations & Eigenvalues](phases/01-math-foundations/03-matrix-transformations/) | Build | Python, Julia |
-| 04 | [Calculus for ML: Derivatives & Gradients](phases/01-math-foundations/04-calculus-for-ml/) | Learn | Python |
-| 05 | [Chain Rule & Automatic Differentiation](phases/01-math-foundations/05-chain-rule-and-autodiff/) | Build | Python |
-| 06 | [Probability & Distributions](phases/01-math-foundations/06-probability-and-distributions/) | Learn | Python |
-| 07 | [Bayes' Theorem & Statistical Thinking](phases/01-math-foundations/07-bayes-theorem/) | Build | Python |
-| 08 | [Optimization: Gradient Descent Family](phases/01-math-foundations/08-optimization/) | Build | Python |
-| 09 | [Information Theory: Entropy, KL Divergence](phases/01-math-foundations/09-information-theory/) | Learn | Python |
-| 10 | [Dimensionality Reduction: PCA, t-SNE, UMAP](phases/01-math-foundations/10-dimensionality-reduction/) | Build | Python |
-| 11 | [Singular Value Decomposition](phases/01-math-foundations/11-singular-value-decomposition/) | Build | Python, Julia |
-| 12 | [Tensor Operations](phases/01-math-foundations/12-tensor-operations/) | Build | Python |
-| 13 | [Numerical Stability](phases/01-math-foundations/13-numerical-stability/) | Build | Python |
-| 14 | [Norms & Distances](phases/01-math-foundations/14-norms-and-distances/) | Build | Python |
-| 15 | [Statistics for ML](phases/01-math-foundations/15-statistics-for-ml/) | Build | Python |
-| 16 | [Sampling Methods](phases/01-math-foundations/16-sampling-methods/) | Build | Python |
-| 17 | [Linear Systems](phases/01-math-foundations/17-linear-systems/) | Build | Python |
-| 18 | [Convex Optimization](phases/01-math-foundations/18-convex-optimization/) | Build | Python |
-| 19 | [Complex Numbers for AI](phases/01-math-foundations/19-complex-numbers/) | Learn | Python |
-| 20 | [The Fourier Transform](phases/01-math-foundations/20-fourier-transform/) | Build | Python |
-| 21 | [Graph Theory for ML](phases/01-math-foundations/21-graph-theory/) | Build | Python |
-| 22 | [Stochastic Processes](phases/01-math-foundations/22-stochastic-processes/) | Learn | Python |
+| 01 | Document Structure & Metadata | Learn | HTML |
+| 02 | Semantic HTML5 Elements | Learn | HTML |
+| 03 | Accessible Forms & User Input | Learn | HTML |
+| 04 | Interactive & Multimedia Elements | Learn | HTML |
+| 05 | Accessibility (A11y) Fundamentals | Learn | HTML |
 
 </details>
 

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semantic HTML5 Elements | HTML & Semantics</title>
+  <meta name="description" content="Learn to replace div soup with meaningful semantic HTML5 elements.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    body > * {
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    nav {
+      background: #f5f5f5;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 2rem;
+    }
+    
+    nav a {
+      text-decoration: none;
+      color: #667eea;
+      font-weight: 500;
+    }
+    
+    nav a:hover {
+      text-decoration: underline;
+    }
+    
+    main {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    
+    article {
+      background: white;
+      padding: 2rem;
+    }
+    
+    section {
+      margin-bottom: 2rem;
+    }
+    
+    section h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 0.5rem;
+    }
+    
+    figure {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    
+    figcaption {
+      font-style: italic;
+      color: #666;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+    }
+    
+    aside {
+      background: #f9fafb;
+      padding: 1.5rem;
+      border-radius: 8px;
+      height: fit-content;
+    }
+    
+    aside h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+    
+    aside ul {
+      list-style: none;
+    }
+    
+    aside li {
+      margin-bottom: 0.5rem;
+    }
+    
+    aside a {
+      color: #667eea;
+      text-decoration: none;
+    }
+    
+    aside a:hover {
+      text-decoration: underline;
+    }
+    
+    code {
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    
+    strong {
+      font-weight: 600;
+      color: #667eea;
+    }
+    
+    em {
+      color: #764ba2;
+      font-style: italic;
+    }
+    
+    footer {
+      background: #333;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .tag-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin: 0.25rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    
+    table th {
+      background: #f5f5f5;
+      font-weight: bold;
+    }
+    
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      
+      nav {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      header h1 {
+        font-size: 1.8rem;
+      }
+      
+      table {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🏗️ Semantic HTML5 Elements</h1>
+    <p>Replace div soup with meaningful, self-documenting code</p>
+  </header>
+  
+  <nav aria-label="Main navigation">
+    <a href="#overview">Overview</a>
+    <a href="#layout">Layout Elements</a>
+    <a href="#content">Content Elements</a>
+    <a href="#text">Text Semantics</a>
+  </nav>
+  
+  <main>
+    <article>
+      <section id="overview">
+        <h2>What is Semantic HTML?</h2>
+        
+        <p>
+          <strong>Semantic HTML</strong> uses tags that describe the <em>meaning</em> of content,
+          not just appearance. Compare:
+        </p>
+        
+        <table>
+          <tr>
+            <th>Non-Semantic</th>
+            <th>Semantic</th>
+            <th>Meaning</th>
+          </tr>
+          <tr>
+            <td><code>&lt;div class="nav"&gt;</code></td>
+            <td><code>&lt;nav&gt;</code></td>
+            <td>Navigation menu</td>
+          </tr>
+          <tr>
+            <td><code>&lt;div class="article"&gt;</code></td>
+            <td><code>&lt;article&gt;</code></td>
+            <td>Self-contained content</td>
+          </tr>
+          <tr>
+            <td><code>&lt;div class="sidebar"&gt;</code></td>
+            <td><code>&lt;aside&gt;</code></td>
+            <td>Tangential content</td>
+          </tr>
+          <tr>
+            <td><code>&lt;b&gt;</code></td>
+            <td><code>&lt;strong&gt;</code></td>
+            <td>Importance/urgency</td>
+          </tr>
+          <tr>
+            <td><code>&lt;i&gt;</code></td>
+            <td><code>&lt;em&gt;</code></td>
+            <td>Emphasis/stress</td>
+          </tr>
+        </table>
+        
+        <p>
+          Screen readers announce semantic tags. Search engines understand them.
+          Future developers (and you, six months later) can read the code and understand structure immediately.
+        </p>
+      </section>
+      
+      <section id="layout">
+        <h2>Layout Landmarks</h2>
+        
+        <p>These structural elements define the major regions of a page:</p>
+        
+        <figure>
+          <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+&lt;body&gt;
+  &lt;header&gt;...&lt;/header&gt;      Page header (logo, title)
+  &lt;nav&gt;...&lt;/nav&gt;          Navigation menu
+  &lt;main&gt;                    Primary content (use once per page)
+    &lt;article&gt;...&lt;/article&gt;  Self-contained content (blog post, news)
+    &lt;aside&gt;...&lt;/aside&gt;      Sidebar (related content)
+  &lt;/main&gt;
+  &lt;footer&gt;...&lt;/footer&gt;    Page footer (copyright, links)
+&lt;/body&gt;</pre>
+          <figcaption>Typical page structure using semantic landmarks</figcaption>
+        </figure>
+        
+        <p>Landmark usage:</p>
+        <ul>
+          <li><code>&lt;header&gt;</code>: Page header or section header (can use multiple)</li>
+          <li><code>&lt;nav&gt;</code>: Navigation menu (use multiple for different menus)</li>
+          <li><code>&lt;main&gt;</code>: Primary content (use only once per page)</li>
+          <li><code>&lt;section&gt;</code>: Thematic grouping of content</li>
+          <li><code>&lt;article&gt;</code>: Self-contained, reusable content (blog post, news item)</li>
+          <li><code>&lt;aside&gt;</code>: Tangential content (sidebar, related links)</li>
+          <li><code>&lt;footer&gt;</code>: Page footer or section footer (can use multiple)</li>
+        </ul>
+      </section>
+      
+      <section id="content">
+        <h2>Content Elements</h2>
+        
+        <p>Semantic tags for grouping and presenting content:</p>
+        
+        <h3>Headings Hierarchy</h3>
+        <p>Use heading levels to create a logical outline:</p>
+        
+        <figure>
+          <h1 style="font-size: 1.5rem; margin: 0.5rem 0;">H1: Main Topic</h1>
+          <h2 style="font-size: 1.25rem; margin: 0.5rem 0 0.5rem 1rem;">H2: First Section</h2>
+          <h3 style="font-size: 1.1rem; margin: 0.5rem 0 0.5rem 2rem;">H3: Subsection</h3>
+          <h2 style="font-size: 1.25rem; margin: 0.5rem 0 0.5rem 1rem;">H2: Second Section</h2>
+          <figcaption>Proper heading hierarchy (never skip levels)</figcaption>
+        </figure>
+        
+        <h3>Lists</h3>
+        <ul>
+          <li><code>&lt;ul&gt;</code>: Unordered list (like this one)</li>
+          <li><code>&lt;ol&gt;</code>: Ordered list (numbered)</li>
+          <li><code>&lt;dl&gt;</code>: Description list (term + definition pairs)</li>
+        </ul>
+        
+        <h3>Figures and Captions</h3>
+        <p>
+          Use <code>&lt;figure&gt;</code> and <code>&lt;figcaption&gt;</code> to associate 
+          images, diagrams, or code examples with their captions.
+        </p>
+        
+        <h3>Blockquotes</h3>
+        <blockquote style="border-left: 4px solid #667eea; padding-left: 1rem; margin: 1rem 0; color: #666;">
+          <p>Semantic HTML is not just a best practice—it's a responsibility to make the web accessible to everyone.</p>
+          <footer>— Web Accessibility Expert</footer>
+        </blockquote>
+      </section>
+      
+      <section id="text">
+        <h2>Text-Level Semantics</h2>
+        
+        <p>Distinguish between physical and logical formatting:</p>
+        
+        <table>
+          <tr>
+            <th>Tag</th>
+            <th>Use Case</th>
+            <th>Example</th>
+          </tr>
+          <tr>
+            <td><code>&lt;strong&gt;</code></td>
+            <td>Importance/urgency</td>
+            <td><strong>Warning: This will delete your data.</strong></td>
+          </tr>
+          <tr>
+            <td><code>&lt;em&gt;</code></td>
+            <td>Emphasis/stress</td>
+            <td>I <em>really</em> love this feature.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;code&gt;</code></td>
+            <td>Computer code</td>
+            <td><code>const x = 42;</code></td>
+          </tr>
+          <tr>
+            <td><code>&lt;kbd&gt;</code></td>
+            <td>User input (keyboard)</td>
+            <td>Press <kbd>Ctrl</kbd> + <kbd>C</kbd></td>
+          </tr>
+          <tr>
+            <td><code>&lt;samp&gt;</code></td>
+            <td>Program output</td>
+            <td><samp>$ npm run build</samp></td>
+          </tr>
+          <tr>
+            <td><code>&lt;mark&gt;</code></td>
+            <td>Highlighted/relevant</td>
+            <td>Find the <mark>important</mark> part.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;cite&gt;</code></td>
+            <td>Citation/reference</td>
+            <td>According to <cite>Web Standards Today</cite></td>
+          </tr>
+          <tr>
+            <td><code>&lt;time&gt;</code></td>
+            <td>Date/time</td>
+            <td><time datetime="2024-05-13">May 13, 2024</time></td>
+          </tr>
+        </table>
+      </section>
+    </article>
+    
+    <aside>
+      <h3>📌 Key Tags</h3>
+      <ul>
+        <li><span class="tag-badge">&lt;header&gt;</span></li>
+        <li><span class="tag-badge">&lt;nav&gt;</span></li>
+        <li><span class="tag-badge">&lt;main&gt;</span></li>
+        <li><span class="tag-badge">&lt;article&gt;</span></li>
+        <li><span class="tag-badge">&lt;section&gt;</span></li>
+        <li><span class="tag-badge">&lt;aside&gt;</span></li>
+        <li><span class="tag-badge">&lt;footer&gt;</span></li>
+        <li><span class="tag-badge">&lt;figure&gt;</span></li>
+        <li><span class="tag-badge">&lt;strong&gt;</span></li>
+        <li><span class="tag-badge">&lt;em&gt;</span></li>
+      </ul>
+      
+      <h3>🔗 Resources</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Semantics">MDN Semantics</a></li>
+        <li><a href="https://html5doctor.com/">HTML5 Doctor</a></li>
+        <li><a href="https://validator.w3.org/">W3C Validator</a></li>
+      </ul>
+    </aside>
+  </main>
+  
+  <footer>
+    <p>🎯 This page demonstrates semantic HTML throughout its structure. Inspect the source code to see it in action.</p>
+    <p>&copy; 2024 HTML & Semantics. Built semantically.</p>
+  </footer>
+</body>
+</html>
