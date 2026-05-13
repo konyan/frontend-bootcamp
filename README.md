@@ -263,11 +263,11 @@ Twenty phases. Click any phase to expand its lesson list.
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | Document Structure & Metadata | Learn | HTML |
-| 02 | Semantic HTML5 Elements | Learn | HTML |
-| 03 | Accessible Forms & User Input | Learn | HTML |
-| 04 | Interactive & Multimedia Elements | Learn | HTML |
-| 05 | Accessibility (A11y) Fundamentals | Learn | HTML |
+| 01 | [Document Structure & Metadata](phases/01-html-and-semantics/01-document-structure-metadata/) | Learn | HTML |
+| 02 | [Semantic HTML5 Elements](phases/01-html-and-semantics/02-semantic-html5-elements/) | Learn | HTML |
+| 03 | [Accessible Forms & User Input](phases/01-html-and-semantics/03-accessible-forms-user-input/) | Learn | HTML |
+| 04 | [Interactive & Multimedia Elements](phases/01-html-and-semantics/04-interactive-multimedia-elements/) | Learn | HTML |
+| 05 | [Accessibility (A11y) Fundamentals](phases/01-html-and-semantics/05-accessibility-a11y-fundamentals/) | Learn | HTML |
 
 </details>
 
