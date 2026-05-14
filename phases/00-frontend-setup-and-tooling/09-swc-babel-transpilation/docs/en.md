@@ -1,23 +1,50 @@
 # SWC, Babel & Transpilation
 
-> Transpilers convert modern syntax to what browsers can run — SWC does it 20x faster than Babel.
+> JavaScript evolves faster than browsers do. A transpiler bridges that gap.
 
 **Type:** Build
 **Languages:** TypeScript
 **Prerequisites:** Lesson 05 — Node.js Runtimes & Version Management
 **Time:** ~75 minutes
 
+## Learning Objectives
+
+- Explain why transpilation is a required step for production frontend code
+- Understand the difference between a transpiler and a bundler
+- Configure SWC to convert TypeScript to JavaScript with source maps
+- Compare SWC and Babel output and understand why modern projects prefer SWC
+
 ## The Problem
 
-A developer writes modern TypeScript with optional chaining and async/await. They ship to production and get errors from users on older browsers: `Unexpected token '?.'`. The browser does not understand the syntax. Back in the office, the developer realizes their "build pipeline" was just copying files — it was never actually transpiling anything.
+You write modern TypeScript with optional chaining (`user?.name`), async/await, and arrow functions. It works in your browser on Chrome 120. You deploy and get an error report from a user on older Safari: `Unexpected token '?.'`. Their browser does not understand that syntax. Back in the office you realize your "build pipeline" was just copying files — it was never actually transforming anything.
 
-A second scenario: a team's Webpack + Babel config takes 45 seconds to compile on every save. Half the day is spent watching a progress bar. A colleague swaps to SWC and the compile time drops to two seconds. But source maps stop working — stack traces in the browser now point to wrong line numbers, making debugging harder than before.
+A second scenario: a team's Webpack + Babel setup takes 45 seconds to compile on every file save. Half the workday is watching a progress bar. A developer swaps to SWC and compile time drops to two seconds. But source maps break — stack traces now point to wrong line numbers in the minified output, making debugging impossible.
 
-Transpilation is a required step for production frontend code. Understanding what it does, where it fits in the pipeline, and how to configure it correctly removes a category of invisible bugs.
+Transpilation is a required step for modern frontend code. Understanding what it does, where it fits, and how source maps work removes an entire category of invisible bugs.
 
 ## The Concept
 
-**The compilation pipeline:**
+### JavaScript Versions and Browser Support
+
+JavaScript has yearly specification releases. Each adds new syntax. Browsers implement these releases at different speeds, and old versions never get updates:
+
+```
+Your code (ES2024)          Old Safari 12 (~ES2015)
+──────────────────          ─────────────────────────
+user?.name                  Error: Unexpected token '?.'
+value ?? 'default'          Error: Unexpected token '?'
+await fetchUser()           Understood (added in ES2017)
+```
+
+A transpiler converts modern syntax to older equivalent syntax:
+
+```
+Input:   user?.name
+Output:  user === null || user === void 0 ? void 0 : user.name
+```
+
+### The Compilation Pipeline
+
 ```
 TypeScript source (.ts)
         ↓
@@ -26,27 +53,29 @@ TypeScript source (.ts)
         ↓
    JavaScript (.js)    ← ES2017 or ES5 depending on target
         ↓
-    Bundler             ← resolves imports, splits chunks
+    Bundler             ← resolves imports, combines files
    (Vite / Rollup)
         ↓
    Bundle (.js)         ← what the browser downloads
 ```
 
-**Transpiling vs bundling:** they are separate jobs. A transpiler transforms syntax in a single file. A bundler resolves the dependency graph across all files and combines them. Vite uses esbuild for transpilation in dev and SWC (via a plugin) for production builds.
+Transpiling and bundling are separate jobs. A transpiler transforms one file at a time. A bundler resolves the entire import graph and combines files. Vite uses esbuild for transpilation in dev and SWC (via `@vitejs/plugin-react-swc`) in production.
 
-**SWC vs Babel:**
+### SWC vs Babel
 
 | | SWC | Babel |
 |---|-----|-------|
 | Written in | Rust | JavaScript |
-| Speed | ~20x faster than Babel | Baseline |
+| Speed | ~20x faster | Baseline |
 | Plugin ecosystem | Limited | Extensive |
-| Used by | Next.js, Vite (plugin), Deno | Legacy projects, custom transforms |
-| Type checking | No (strips types only) | No (strips types only) |
+| Used by | Next.js, Vite | Legacy projects |
+| Type checking | No | No |
 
-Neither SWC nor Babel type-checks your code — that is `tsc`'s job. Both only transform syntax.
+Neither SWC nor Babel type-checks your code — that is `tsc`'s job. Both only transform syntax. You can transpile TypeScript without checking it for errors. This distinction confuses many developers.
 
-**Source maps:** a `.map` file that records the mapping from compiled line/column back to source line/column. Without it, a browser stack trace shows a line number in the minified bundle — useless for debugging.
+### Source Maps
+
+When code is transpiled and minified, browser stack traces point to the generated output — not the source you wrote. A source map (`.js.map`) records the mapping from generated positions back to original file and line numbers. Without source maps, debugging a production error means reading minified code.
 
 ## Build It
 
@@ -56,13 +85,25 @@ Neither SWC nor Babel type-checks your code — that is `tsc`'s job. Both only t
 pnpm add -D @swc/core @swc/cli
 ```
 
-### Step 2: Create the source file
+### Step 2: Create a TypeScript source file
 
-Copy `code/input.ts` — it uses several modern TypeScript features: arrow functions, destructuring, spread, async/await, and template literals.
+Create `code/input.ts` using modern features:
+
+```typescript
+interface User {
+  name: string
+  email?: string
+}
+
+const greet = async (user: User): Promise<string> => {
+  const name = user?.name ?? 'stranger'
+  return `Hello, ${name}!`
+}
+
+export { greet }
+```
 
 ### Step 3: Create `.swcrc`
-
-Copy `code/.swcrc` to the project root. Key settings:
 
 ```json
 {
@@ -74,66 +115,79 @@ Copy `code/.swcrc` to the project root. Key settings:
 }
 ```
 
-`target: "es2017"` means async/await is kept (it is ES2017 syntax). Change to `"es5"` to see Babel-style polyfill output.
+`target: "es2017"` keeps async/await as-is. Change to `"es5"` to see full transformation.
 
-### Step 4: Compile and inspect the output
+### Step 4: Compile and inspect output
 
 ```bash
-pnpm swc input.ts -o output.js
+pnpm swc code/input.ts -o code/output.js
 ```
 
-Open `output.js` — TypeScript type annotations are gone, but the syntax is otherwise unchanged (targeting ES2017). Open `output.js.map` — this is the source map.
+Open `output.js` — type annotations are gone, syntax is otherwise unchanged (targeting ES2017). Open `output.js.map` — this is the source map JSON.
 
-### Step 5: Compare with Babel
+### Step 5: Change the target and compare
 
-Install Babel:
+Edit `.swcrc` to `"target": "es5"` and recompile. Compare the output — async/await becomes a state machine using generator functions. SWC transformed the syntax to be compatible with browsers that predate ES2017.
+
+### Step 6: Install Babel and compare outputs
+
 ```bash
 pnpm add -D @babel/core @babel/cli @babel/preset-env @babel/preset-typescript
 ```
 
-Copy `code/babel.config.json`. Run:
-```bash
-pnpm babel input.ts --out-file output-babel.js
+Create `babel.config.json`:
+```json
+{
+  "presets": [
+    ["@babel/preset-env", { "targets": "defaults" }],
+    "@babel/preset-typescript"
+  ]
+}
 ```
 
-Compare `output.js` (SWC) and `output-babel.js` (Babel). Babel's output is larger because it generates helper functions and polyfills for the browser targets in the config.
+```bash
+pnpm babel code/input.ts --out-file code/output-babel.js
+```
+
+Compare `output.js` (SWC) and `output-babel.js` (Babel). Babel's output is larger — it includes helper functions for the browser targets.
 
 ## Use It
 
-Next.js uses SWC by default since v12. The configuration lives in `next.config.js`:
+Next.js uses SWC by default since v12:
 
 ```js
 const nextConfig = {
   swcMinify: true,
-};
+}
 ```
 
-Vite uses esbuild in dev mode for speed and Rollup (with optional SWC via `@vitejs/plugin-react-swc`) for production. The transpiler is one layer below the bundler in both frameworks — you rarely configure it directly unless you need custom transforms.
+Vite uses esbuild in dev mode and SWC in production via `@vitejs/plugin-react-swc`. For most app development, the framework handles transpilation automatically — you configure it only when you need custom transforms like decorators or macro-style transforms.
 
 ## Ship It
 
-The `.swcrc` and `package.json` from `code/` — use these when you need a standalone transpilation step outside of a framework (e.g., compiling a library). For app development inside Next.js or Vite, the framework handles transpilation and you only need to understand the concept.
-
-The `outputs/prompt-transpile-debugger.md` is a reusable prompt for diagnosing build tool errors.
+The `.swcrc` from `code/` covers the standard TypeScript-to-JS transform. Use it for library builds or standalone scripts. For apps in Vite or Next.js, the framework owns this file — you only need to understand the concept.
 
 ## Exercises
 
-1. Change `"target"` in `.swcrc` from `"es2017"` to `"es5"` and compare the compiled output — how does SWC handle async/await differently?
-2. Add `"jsx": "react-jsx"` to the SWC parser config and rename `input.ts` to `input.tsx` with a simple JSX expression — explain what SWC does with it.
-3. Explain in one paragraph why a TypeScript type error does NOT stop SWC from compiling (hint: SWC strips types without running the type checker — `tsc --noEmit` is a separate step).
+1. Change `"target"` to `"es5"` and recompile `input.ts`. Find the async/await in the output. How does SWC express it in ES5?
+
+2. Add `"jsx": "react-jsx"` to the SWC parser config, rename `input.ts` to `input.tsx`, and add a JSX expression. What does the output contain?
+
+3. Explain in writing: why does a TypeScript type error NOT stop SWC from producing output? What is the separate command you would run to catch type errors before shipping?
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| Transpiler | "Compiler" | A tool that transforms source code from one syntax to another, targeting a specific JS version — does not do type checking |
-| Bundler | "Webpack" | A tool that resolves the full dependency graph and combines modules into output files |
-| Source map | "The .map file" | A JSON file that maps compiled byte offsets back to original source locations — used by browser DevTools |
-| Target | "What browsers we support" | The ECMAScript version the transpiler should output — lower targets mean more transformation |
-| Type stripping | "SWC type checking" | Removing TypeScript annotations without validating them — SWC strips types; `tsc` type-checks them |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Transpiler** | "A compiler" | A tool that transforms source code from one syntax to another — does not type-check |
+| **Bundler** | "Same as a transpiler" | A tool that resolves the import graph across files and combines them into output chunks |
+| **Source map** | "A debugging extra" | A JSON file mapping compiled positions back to source lines — essential for production debugging |
+| **Target** | "The browser you want to support" | The ECMAScript version the transpiler outputs — lower targets mean more transformation |
+| **Type stripping** | "Type checking" | Removing TypeScript annotations without validating them — what SWC/esbuild do; `tsc` validates |
 
 ## Further Reading
 
 - [SWC docs](https://swc.rs/docs/configuration/swcrc) — .swcrc configuration reference
-- [Babel docs](https://babeljs.io/docs/config-files) — config file formats and preset options
-- [Next.js blog: Rust compiler](https://nextjs.org/blog/next-12#faster-builds-and-fast-refresh-with-rust-compiler) — why Next.js switched from Babel to SWC
+- [Babel docs](https://babeljs.io/docs/config-files) — config formats and presets
+- [Next.js: Rust compiler](https://nextjs.org/blog/next-12#faster-builds-and-fast-refresh-with-rust-compiler) — why Next.js switched from Babel to SWC
+- [Source Maps explainer](https://web.dev/articles/source-maps) — how source maps work and how to use them

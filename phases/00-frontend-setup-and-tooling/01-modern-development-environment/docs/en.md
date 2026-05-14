@@ -1,153 +1,174 @@
-# The Modern Development Environment
+# Modern Development Environment
 
-> A clean frontend setup removes the friction of missing tools, inconsistent editor behavior, and mismatched runtime versions.
+> A professional developer's machine is a precision instrument — every tool chosen deliberately, every version pinned, every layer understood.
 
-**Type:** Build
-**Languages:** Shell
+**Type:** Learn
+**Languages:** JavaScript, Shell
 **Prerequisites:** None
-**Time:** ~60 minutes
+**Time:** ~45 minutes
+
+## Learning Objectives
+
+- Understand the four-layer frontend development stack and what belongs in each layer
+- Install and verify Node.js, pnpm, and VS Code
+- Create and run your first JavaScript project from the command line
+- Distinguish between global tools and project-local tools
 
 ## The Problem
 
-You clone a repo from a teammate. You run `pnpm install`. It fails with a Node version error. You switch Node versions, try again. Now ESLint is throwing parse errors it didn't throw on their machine. You open VS Code and the formatter doesn't run on save because the Prettier extension isn't installed or the workspace settings aren't committed. An hour later you haven't written a single line of feature code.
+Two students start building the same React app. One finishes in a weekend with clean, fast workflows. The other spends half their time debugging why their code works differently on their machine than on their teammate's, why their editor shows no errors even though the build fails, and why the setup tutorial they followed broke halfway through.
 
-This isn't bad luck. It's the predictable result of an unconfigured environment. Every developer on a team brings their own shell, their own editor state, their own runtime versions — and without explicit configuration at each layer, the experience diverges silently over time.
-
-The fix is to treat your environment as part of the project. Shell, runtime, editor, and project config are not personal preferences; they are infrastructure. When each layer is explicitly configured and version-controlled, a fresh clone just works.
+The difference is not talent — it is environment. A frontend project involves at least four layers of tools: shell, runtime, editor, and project config. When any layer is missing or misconfigured, the failure shows up somewhere unexpected. Understanding the full stack as a map prevents an entire category of confusion before it starts.
 
 ## The Concept
 
-The frontend development environment is a stack of four layers, each one configuring the layer above it.
+The modern frontend development stack has four layers. Each has a clear job:
 
 ```
-+---------------------------+
-|   Project Config          |  package.json, .eslintrc, prettier.config.js
-+---------------------------+
-|   Editor                  |  VS Code + .vscode/settings.json + extensions
-+---------------------------+
-|   Runtime                 |  Node.js version, pnpm version, global tools
-+---------------------------+
-|   Shell                   |  zsh/bash, PATH, dotfiles, aliases
-+---------------------------+
+┌─────────────────────────────────────────────┐
+│  Layer 4: Project Config                    │
+│  package.json, tsconfig.json, vite.config   │
+│  Controls how your specific project builds  │
+├─────────────────────────────────────────────┤
+│  Layer 3: Editor (VS Code)                  │
+│  Language server, linter, formatter         │
+│  Gives feedback while you type              │
+├─────────────────────────────────────────────┤
+│  Layer 2: Runtime (Node.js)                 │
+│  Executes JavaScript outside the browser    │
+│  Powers build tools and the package manager │
+├─────────────────────────────────────────────┤
+│  Layer 1: Shell (Terminal)                  │
+│  bash / zsh                                 │
+│  The command interface for everything above │
+└─────────────────────────────────────────────┘
 ```
 
-The shell runs when your terminal opens. It sets PATH so your system can find `node`, `pnpm`, and `git`. The runtime layer is the specific version of Node installed and active. The editor layer is VS Code plus whatever workspace settings and extensions are present. The project config layer is the repo itself: linter rules, formatter config, `package.json` scripts.
+**Why each layer matters:**
 
-Problems compound when layers are out of sync. The right approach is to pin versions explicitly and commit configuration at every layer. Then the environment is reproducible by anyone who clones the project.
+| Layer | What breaks without it |
+|-------|------------------------|
+| Shell | Cannot run any commands |
+| Node.js | Cannot install packages or run build tools |
+| Editor | No feedback while coding; errors only visible at build time |
+| Project config | Build behaves differently per machine |
+
+**Global vs local tools:**
+
+Some tools are installed globally — once per machine: Node, pnpm, VS Code.
+Others are installed locally — once per project: React, Vite, TypeScript.
+
+Global tools do not belong in `package.json`. Project tools do not belong in global installs. Mixing them is the most common source of "works on my machine" bugs.
 
 ## Build It
 
-### Step 1: Verify core tools are installed
+### Step 1: Install Node.js via fnm
 
-Open a terminal and run each command. Every one should print a version number without errors.
+Use a version manager instead of the direct Node installer — it lets you switch versions per project.
+
+Install fnm (Fast Node Manager):
+```bash
+curl -fsSL https://fnm.vercel.app/install | bash
+```
+
+Restart your terminal, then install the latest LTS:
+```bash
+fnm install --lts
+fnm use lts-latest
+node --version
+```
+
+### Step 2: Install pnpm
+
+pnpm is the package manager used throughout this curriculum. It is faster and uses less disk space than npm.
 
 ```bash
-git --version
-node --version
+npm install -g pnpm
 pnpm --version
+```
+
+### Step 3: Install VS Code
+
+Download from [code.visualstudio.com](https://code.visualstudio.com/). After installing, enable the `code` terminal command:
+
+`Cmd+Shift+P` → type "Shell Command: Install 'code' command in PATH" → Enter.
+
+Verify:
+```bash
 code --version
 ```
 
-If any command returns `command not found`:
-- **git**: Install from [git-scm.com](https://git-scm.com) or via `brew install git`
-- **node**: Install via [fnm](https://github.com/Schniz/fnm): `brew install fnm && fnm install 20`
-- **pnpm**: `npm install -g pnpm` or `brew install pnpm`
-- **code**: Open VS Code, press Cmd+Shift+P, run "Shell Command: Install 'code' command in PATH"
-
-### Step 2: Run the verification script
-
-The verification script checks all four tools and reports pass/fail with version output.
+### Step 4: Create your first project
 
 ```bash
-python3 phases/00-frontend-setup-and-tooling/01-modern-development-environment/code/verify.py
+mkdir my-first-app
+cd my-first-app
+pnpm init
 ```
 
-Expected output when everything is configured correctly:
+This creates `package.json` — the Layer 4 config file for your project.
 
-```
-=== Frontend Setup & Tooling Check ===
-
-Core:
-  [PASS] Git (git version 2.43.0)
-  [PASS] Node.js (v20.11.0)
-  [PASS] npm (10.2.4)
-  [PASS] pnpm (8.15.1)
-
-Result: 4/4 core checks passed
-[INFO] VS Code CLI found
-
-You're ready. Start with Phase 1.
-```
-
-Fix any `[FAIL]` lines before proceeding.
-
-### Step 3: Create workspace settings for VS Code
-
-Inside any frontend project, create `.vscode/settings.json` with the following content. Commit this file to git so every developer gets the same editor behavior.
-
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.tabSize": 2
-}
-```
-
-`formatOnSave` runs Prettier every time you save a file. `defaultFormatter` ensures VS Code uses Prettier and not a built-in formatter or a conflicting extension.
-
-### Step 4: Pin the Node version
-
-Create a `.node-version` file in the root of your project. Tools like fnm and nvm read this file and automatically switch to the correct version when you enter the directory.
+### Step 5: Add a dependency and run code
 
 ```bash
-echo "20" > .node-version
+pnpm add -D typescript
 ```
 
-Alternatively, create `.nvmrc` with the same content. Both formats are widely supported. Commit this file alongside `.vscode/settings.json`.
+Create `hello.ts`:
+```typescript
+const greet = (name: string): string => `Hello, ${name}!`
+console.log(greet("world"))
+```
+
+Run it:
+```bash
+node --experimental-strip-types hello.ts
+```
+
+### Step 6: Verify the full stack
+
+Run the verification script from `code/verify.sh` to confirm all four layers are operational:
+```bash
+bash code/verify.sh
+```
+
+All checks passing means your environment is ready for the remaining lessons.
 
 ## Use It
 
-When you run `pnpm create next-app@latest` or `pnpm create vite@latest`, the generated project already includes `.vscode/settings.json` and a `package.json#engines` field:
+`create-vite` scaffolds a full app with all four layers pre-configured — bundler, TypeScript, and React wired together:
 
-```json
-{
-  "engines": {
-    "node": ">=18.0.0"
-  }
-}
+```bash
+pnpm create vite my-app --template react-ts
 ```
 
-The `engines` field documents the required Node version at the package level. Combined with a `.node-version` file and the `verify.py` script, you have three complementary layers enforcing consistency: the version manager pins the runtime, the script checks it, and `package.json` communicates it to any package manager that runs install.
-
-The `.vscode/settings.json` approach is the same as what scaffolded projects use, but now you understand why each key is there rather than accepting it as boilerplate.
+The generated `package.json`, `tsconfig.json`, and `vite.config.ts` are the Layer 4 config files you will learn to write from scratch in Lessons 09-12. Understanding what each file does now makes that work straightforward rather than overwhelming.
 
 ## Ship It
 
-The `verify.py` script in `code/` is the reusable artifact from this lesson. Copy it into any new project and run it as the first onboarding step:
-
-```bash
-python3 code/verify.py
-```
-
-It checks Git, Node.js, npm, and pnpm, prints clear pass/fail output, and exits with code 1 if anything is missing. Point new teammates to it in your project README so environment setup is a single command, not a guessing game.
+A **new-machine setup script** — a shell file you can run on any fresh machine to install all four layers in under five minutes. Start it now in `outputs/new-machine-setup.sh` and add to it as you complete each lesson in this phase.
 
 ## Exercises
 
-1. Run `verify.py` against your own machine. If any check fails, install the missing tool and re-run until all four pass.
-2. Add `"editor.codeActionsOnSave": {"source.fixAll.eslint": "explicit"}` to your workspace settings. Open a JS file with a lint error and save it. Describe what changed and why this setting is more explicit than `true`.
-3. Add a `package.json#engines` field to a project pinning Node to `>=20.0.0`. Then run `pnpm install` and observe whether pnpm warns you if your active Node version is older than the requirement.
+1. Run `node --version`, `pnpm --version`, and `code --version`. Look up the current LTS release on [nodejs.org/en/about/releases](https://nodejs.org/en/about/releases/). Are you on LTS? If not, run `fnm install --lts && fnm use lts-latest`.
+
+2. Open VS Code with `code .` inside `my-first-app`. Find `package.json` in the Explorer. Identify which fields control the project name, version, and scripts.
+
+3. Explain in your own words: why should React be installed with `pnpm add react` inside the project, while pnpm itself is installed globally? What would break if you reversed that?
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| Runtime | "What Node version are you on?" | The executing environment that interprets your code — here, a specific version of Node.js |
-| Version manager | "Use fnm or nvm" | A tool that installs multiple Node versions and switches between them per project |
-| Workspace settings | "It's in `.vscode`" | VS Code configuration scoped to one project folder, committed to git, overrides user settings |
-| PATH | "It's not on my PATH" | An ordered list of directories the shell searches when you type a command name |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Node.js** | "The thing you need to run websites" | A JavaScript runtime for executing JS outside the browser — powers build tools, not the deployed app |
+| **Package manager** | "npm and pnpm are the same" | A tool that downloads libraries from the npm registry — pnpm stores packages once globally, npm duplicates them per project |
+| **Global install** | "Installing a tool everywhere is always fine" | A tool installed machine-wide, not in any project — only appropriate for dev utilities like pnpm or fnm |
+| **Dev dependency** | "Same as a regular dependency" | A package needed only during development (build tools, linters) — not included in what users download |
+| **Layer 4 config** | "Boilerplate to copy-paste" | Project-specific files (package.json, tsconfig.json) that tell every tool how to behave for this project |
 
 ## Further Reading
 
-- [Node.js Downloads](https://nodejs.org/en/download) — official release page; prefer the LTS line
-- [fnm — Fast Node Manager](https://github.com/Schniz/fnm) — recommended version manager; reads `.node-version` automatically
-- [VS Code: User and Workspace Settings](https://code.visualstudio.com/docs/getstarted/settings) — complete reference for the settings hierarchy
+- [Node.js release schedule](https://nodejs.org/en/about/releases/) — understanding LTS vs current releases
+- [fnm documentation](https://github.com/Schniz/fnm) — the version manager used in this curriculum
+- [VS Code setup guide](https://code.visualstudio.com/docs/setup/mac) — official macOS setup instructions
+- [A Modern Front-end Project Setup](https://medium.com/@mihirsanghavi/a-modern-front-end-project-setup-98e698c71aad) — the article that inspired this phase

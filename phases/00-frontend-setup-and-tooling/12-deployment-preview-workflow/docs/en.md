@@ -1,75 +1,77 @@
 # Deployment & Preview Workflow
 
-> A feature is not done when it works locally — it is done when it works on the same infrastructure your users hit.
+> "It works on my machine" ends the moment you set up a preview deploy.
 
 **Type:** Build
-**Languages:** TypeScript
+**Languages:** TypeScript, Shell
 **Prerequisites:** Lessons 06 and 11
 **Time:** ~60 minutes
 
+## Learning Objectives
+
+- Understand why local and production environments behave differently
+- Configure environment variables correctly for a Vite frontend app
+- Create `vercel.json` with security headers and frozen-lockfile installs
+- Establish a preview-deploy workflow so reviewers test the real artifact, not a local server
+
 ## The Problem
 
-A developer builds their app locally and it works perfectly. They push to GitHub and Vercel deploys it. The deployed app crashes at runtime because `import.meta.env.VITE_API_URL` is `undefined` — they added the variable to their local `.env` file but forgot to add it in the Vercel dashboard. The error only appears after the deploy reaches users.
+You build your app locally and it works perfectly. You push to GitHub. Ten minutes later Vercel says the deploy succeeded. You open the URL and it crashes: `Cannot read properties of undefined`. The API call is failing because `VITE_API_URL` is `undefined` — you added it to your local `.env` file but never added it to the Vercel dashboard.
 
-A reviewer clicks the preview link in a pull request and sees a 404. The route the developer added is in the codebase, but the `vercel.json` does not have a rewrite rule, so direct URL access to a client-side route falls through to the static file server and fails.
+This is the most common cause of "works locally, broken in production" for frontend apps. It is entirely preventable.
 
-The production deploy overwrites a working version with a broken one because there was no staging check. The team has no `build-check.sh`, no CI run on the PR, and no preview environment to validate against before promotion. Every developer manually runs their own incantation to ship, so the deploy process is different every time.
+A second problem: you push a fix, wait for CI, wait for the deploy, share the URL — and a reviewer says the change is not visible. You pushed to the wrong branch and the preview went to the wrong environment. Without a structured deployment workflow, every team member ships differently.
 
 ## The Concept
 
-**The modern frontend deploy pipeline:**
+### Why Local and Production Differ
+
+| Aspect | Local | Production |
+|--------|-------|------------|
+| Environment variables | Your `.env` file | Platform dashboard settings |
+| Operating system | macOS (case-insensitive paths) | Linux (case-sensitive) |
+| Node version | Whatever is installed | Platform-configured |
+| Build command | You run it | Platform runs it on every push |
+
+A file named `UserCard.tsx` imported as `import UserCard from './usercard'` works on macOS and silently fails on Linux. Preview deploys catch this because they run on the same Linux infrastructure as production.
+
+### Environment Variables in Frontend Apps
+
+All frontend JavaScript runs in the browser. There is no secure server-side environment — everything bundled into the JS is visible in DevTools. The `VITE_` prefix enforces this distinction:
+
+| Prefix | When resolved | Browser visible |
+|--------|--------------|-----------------|
+| `VITE_` | Build time | Yes — inlined as a string literal |
+| `NEXT_PUBLIC_` | Build time | Yes — inlined as a string literal |
+| (no prefix) in Next.js | Server only | No |
+
+If a `VITE_` variable is missing at build time, it becomes the string `"undefined"` — no error until the code uses it at runtime.
+
+**Never put secrets (API keys, tokens) in `VITE_` variables.** They are public.
+
+### The Deploy Pipeline
 
 ```
 Developer pushes branch
-        |
-        v
-  CI runs build checks
-  (tsc, lint, pnpm build)
-        |
-        v
-  Preview deploy created
-  (unique URL per PR)
-        |
-        v
-  Reviewer approves
-  (checks preview URL)
-        |
-        v
-  Merge to main
-        |
-        v
-  Production promotion
-  (same artifact, new routing)
+        ↓
+CI: tsc --noEmit, pnpm lint, pnpm build
+        ↓
+Preview deploy created    ← unique URL, same infrastructure as prod
+        ↓
+Reviewer tests preview URL
+        ↓
+Merge to main
+        ↓
+Production promotion      ← same artifact, no rebuild
 ```
 
-No new build happens at the production promotion step. The artifact built for preview is the same artifact that reaches production — this guarantees what you reviewed is what users get.
-
-**Environment variables in frontend apps:**
-
-Frontend JavaScript runs in the browser. There is no secure server-side environment, so all variables bundled into the JS are visible to anyone who opens DevTools. The framework prefixes enforce this distinction:
-
-| Prefix | Framework | When resolved | Visible to browser |
-|--------|-----------|--------------|-------------------|
-| `VITE_` | Vite | Build time | Yes — bundled into JS |
-| `NEXT_PUBLIC_` | Next.js | Build time | Yes — bundled into JS |
-| (no prefix) | Next.js | Server only | No — never in the bundle |
-
-Build-time variables are inlined as string literals during `vite build`. If the variable is missing at build time, the literal is `undefined` and no runtime error occurs until the code tries to use it — which is why the bug is easy to miss locally but surfaces in production.
-
-**Preview deploys** give every pull request its own URL. The reviewer tests the actual built artifact on the actual hosting infrastructure, not a local dev server. This catches:
-
-- Missing environment variables
-- Routing mismatches (`vercel.json` rewrite rules)
-- Asset loading failures (wrong base path)
-- Platform-specific build failures (Linux case-sensitivity vs macOS)
+The production promotion step does not rebuild. The artifact that was previewed and reviewed is exactly what reaches production.
 
 ## Build It
 
 ### Step 1: Create `.env.example`
 
-Copy `code/.env.example` to the project root and commit it:
-
-```
+```bash
 # App
 VITE_APP_NAME=My Frontend App
 VITE_API_URL=https://api.example.com
@@ -79,21 +81,22 @@ VITE_ENABLE_ANALYTICS=false
 VITE_ENABLE_DEBUG_PANEL=false
 ```
 
-This file is a contract. It documents which variables the app requires without exposing real values. Every developer who clones the repo copies it to `.env` and fills in their values. Add `.env` to `.gitignore` — never commit it.
+Commit this file. It documents what variables the app requires without exposing real values. Add `.env` to `.gitignore` — never commit it.
+
+Every developer who clones the repo copies `.env.example` to `.env` and fills in their values.
 
 ### Step 2: Add env vars to the platform
 
-In the Vercel dashboard: Project Settings > Environment Variables. Add each `VITE_*` variable for the Production, Preview, and Development environments. Or use the CLI:
+In the Vercel dashboard: Project Settings > Environment Variables. Add each `VITE_*` variable for Production, Preview, and Development environments.
 
+Or via the CLI:
 ```bash
 vercel env add VITE_API_URL
 ```
 
-Vercel re-runs the build when variables change. Run a fresh deploy after adding variables to verify they are picked up.
+Run a fresh deploy after adding variables — Vercel rebuilds when environment variables change.
 
 ### Step 3: Create `vercel.json`
-
-Copy `code/vercel.json` to the project root:
 
 ```json
 {
@@ -119,31 +122,45 @@ Copy `code/vercel.json` to the project root:
 }
 ```
 
-`--frozen-lockfile` ensures the platform installs exactly the versions in `pnpm-lock.yaml`. Without it, a patch release published after your last commit can change the deployed behavior. The `Cache-Control: immutable` header on `/assets/` tells browsers never to re-request hashed asset files — since the hash changes when content changes, this is safe and eliminates unnecessary network requests on repeat visits.
+`--frozen-lockfile` fails if `pnpm-lock.yaml` is out of sync with `package.json` — ensuring the platform installs exactly the versions that were tested. `Cache-Control: immutable` on `/assets/` tells browsers to cache hashed asset files forever (safe because the hash changes with content).
 
-### Step 4: Run `build-check.sh` locally before merging
+### Step 4: Create `build-check.sh`
 
-Copy `code/build-check.sh` to the project root and make it executable:
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Type checking..."
+pnpm tsc --noEmit
+
+echo "Linting..."
+pnpm lint
+
+echo "Building..."
+pnpm build
+
+echo "All checks passed."
+```
+
+Make it executable and run it before opening a PR:
 
 ```bash
 chmod +x build-check.sh
 ./build-check.sh
 ```
 
-The script runs `tsc --noEmit`, `pnpm lint`, and `pnpm build` in sequence. If any step fails, the script exits immediately (`set -euo pipefail`). Run this before opening a PR rather than waiting for CI to catch failures.
-
-### Step 5: Push a branch and verify the preview URL
+### Step 5: Push and verify the preview URL
 
 ```bash
 git checkout -b feat/my-feature
 git push origin feat/my-feature
 ```
 
-Vercel creates a preview deploy automatically. The URL appears in the GitHub PR as a status check. Click it, navigate to the pages your PR touches, and confirm they behave correctly. Share the preview URL in the PR description so reviewers can test without setting up the project locally.
+Vercel creates a preview deploy automatically. The URL appears in the GitHub PR as a status check. Click it, navigate to the pages your PR touches, and verify behavior. Share the URL in the PR description so reviewers test the real artifact.
 
 ## Use It
 
-Netlify's `netlify.toml` serves the same purpose as `vercel.json`:
+Netlify uses `netlify.toml` for the same configuration:
 
 ```toml
 [build]
@@ -156,7 +173,7 @@ Netlify's `netlify.toml` serves the same purpose as `vercel.json`:
     Cache-Control = "public, max-age=31536000, immutable"
 ```
 
-GitHub Environments add a production gate on top of the platform-level deploy. Configure a `production` environment in repository Settings > Environments, add required reviewers, and reference it in the workflow:
+GitHub Environments add a human approval gate before production deploys. Add required reviewers in repository Settings > Environments:
 
 ```yaml
 jobs:
@@ -166,30 +183,33 @@ jobs:
       - run: ./build-check.sh
 ```
 
-No deploy runs without a named reviewer approving it. This is the human checkpoint between preview validation and production promotion.
+No deploy runs without approval. This is the human checkpoint between preview validation and production promotion.
 
 ## Ship It
 
-The `vercel.json`, `.env.example`, and `build-check.sh` in `code/`, plus the `prompt-deploy-troubleshooter.md` output — drop all four into any frontend project before the first deploy. They give you a reproducible build check, a documented env var contract, a platform config with security headers, and a diagnostic prompt for when deploys fail.
+The four files — `vercel.json`, `.env.example`, `build-check.sh`, and a `prompt-deploy-troubleshooter.md` in `outputs/` — form a complete deploy baseline. Add them to every project before the first deploy.
 
 ## Exercises
 
-1. Add a `VITE_APP_VERSION` env var and set it to the current git SHA in the build command: `VITE_APP_VERSION=$(git rev-parse --short HEAD) pnpm build`. Display it in a footer component. Explain in writing why this approach works for build-time values but would be wrong for a value that needs to change without a new build.
-2. Write a GitHub Actions workflow file (`.github/workflows/pr-check.yml`) that runs `./build-check.sh` on every pull request targeting `main`.
-3. Explain why a `.env` file must be in `.gitignore` and what the concrete consequences are if it is accidentally committed and pushed to a public repository — include what an attacker could do with the values and how to remediate the exposure.
+1. Add `VITE_APP_VERSION=$(git rev-parse --short HEAD) pnpm build` as the build command and display the value in a footer component. Explain why this works for build-time values but not for values that need to change without a rebuild.
+
+2. Write a GitHub Actions workflow file at `.github/workflows/pr-check.yml` that runs `./build-check.sh` on every pull request targeting `main`.
+
+3. Explain what an attacker can do if a `.env` file containing `VITE_API_KEY=sk-live-...` is accidentally committed to a public repository. What are the two steps to remediate it?
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| preview deploy | "preview URL" | A fully built and hosted version of the app from a specific branch or PR, distinct from production |
-| environment variable | "env var" | A named value injected into the build or runtime environment, kept outside source code |
-| build-time variable | "VITE_ prefix" | A variable inlined as a string literal during the build — visible in the browser bundle |
-| production promotion | "promoting to prod" | Making an already-built artifact available at the production URL without rebuilding |
-| CI/CD | "the pipeline" | Automated steps (build, test, deploy) triggered by a git push |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Preview deploy** | "A staging environment" | A fully built and hosted version of the app from a specific PR — distinct URL, same infrastructure as production |
+| **Build-time variable** | "A server environment variable" | A value inlined as a string literal during `vite build` — visible in the browser bundle |
+| **Frozen lockfile** | "A stricter install mode" | Install fails if `pnpm-lock.yaml` is out of sync — guarantees the platform installs the tested versions |
+| **Production promotion** | "A new deploy" | Making an already-built artifact available at the production URL — no rebuild, what was previewed is what ships |
+| **CI/CD** | "Just automation" | A pipeline that runs checks (build, lint, typecheck) on every push and deploys only when they pass |
 
 ## Further Reading
 
-- [Vercel environment variables docs](https://vercel.com/docs/environment-variables) — how to add, scope, and reference env vars per environment
+- [Vercel environment variables](https://vercel.com/docs/environment-variables) — how to add, scope, and reference env vars
 - [Netlify deploy configuration](https://docs.netlify.com/configure-builds/file-based-configuration/) — `netlify.toml` reference
-- [The Twelve-Factor App: Config](https://12factor.net/config) — the principle behind keeping config out of code and in the environment
+- [The Twelve-Factor App: Config](https://12factor.net/config) — the principle behind keeping config out of code
+- [GitHub Actions for frontend](https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs) — Node.js CI workflow reference

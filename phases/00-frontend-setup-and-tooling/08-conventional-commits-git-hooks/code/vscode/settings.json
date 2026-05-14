@@ -1,6 +1,0 @@
-{
-  "git.enableSmartCommit": true,
-  "git.confirmSync": false,
-  "gitlens.hovers.currentLine.over": "line",
-  "conventionalCommits.scopes": ["ui", "api", "auth", "deps", "config"]
-}

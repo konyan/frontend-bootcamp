@@ -1,8 +1,0 @@
-{
-  "name": "my-frontend-app",
-  "version": "0.1.0",
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
-  }
-}

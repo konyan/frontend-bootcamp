@@ -1,179 +1,187 @@
 # OS, Shell & Workflow Automation
 
-> If every command feels longer than it should, your workflow stays slow no matter how good the framework is.
+> The terminal is not a last resort — it is the fastest interface between thought and action.
 
-**Type:** Build
+**Type:** Learn
 **Languages:** Shell
-**Prerequisites:** Lesson 01
+**Prerequisites:** Lesson 01 — Modern Development Environment
 **Time:** ~60 minutes
+
+## Learning Objectives
+
+- Understand how the shell startup file works and what PATH controls
+- Create aliases and shell functions that eliminate repetitive typing
+- Navigate directories faster using keyboard shortcuts and zoxide
+- Install Starship to show git branch and Node version in the prompt automatically
 
 ## The Problem
 
-A developer types `pnpm install` 40 times a day. They kill stuck dev servers by opening Activity Monitor, clicking through the process list, and force-quitting the right PID. They forget which Node version a project needs every time they switch repos and have to open `package.json` to check. Each of these is a small friction. But small friction repeated hundreds of times a day across months adds up to hours lost and a constant low-level sense of irritation that makes the work feel harder than it is.
+A junior developer spends 30 seconds every time they switch projects: `cd Desktop`, `cd projects`, `cd my-app`, `ls` to remember the folder name, `cd src`, then finally run a command. Multiply by 50 context switches per day and they lose 25 minutes to navigation alone.
 
-The shell is configurable. Every repetitive command can become a two-letter alias. Every multi-step operation can become a function that accepts arguments. That configuration lives in a dotfiles repository and follows you across machines. This is not about being clever — it is about removing unnecessary cognitive load from the mechanical parts of the job so more attention is available for the actual work.
+They type `git status` hundreds of times a day. They open new terminal tabs and retype the last ten commands because they forgot what they ran. They cannot tell which git branch they are on or which Node version is active without running a separate command.
 
-The setup takes one hour. The payback is permanent.
+The shell is programmable. Every repeated action in the terminal can be automated into a two-letter alias or a function that runs in milliseconds.
 
 ## The Concept
 
-When you open a terminal, the shell executes a startup script before it gives you a prompt. On zsh (the default on macOS) that script is `~/.zshrc`. On bash it is `~/.bashrc` or `~/.bash_profile`. These files are sourced in a specific order depending on whether the shell is a login shell or an interactive shell.
+### The Shell Startup File
+
+When a terminal opens, the shell reads a config file before showing the prompt. On macOS with zsh, this file is `~/.zshrc`.
 
 ```
 Terminal opens
-      |
-      v
-  ~/.zprofile   (login shell, run once at login)
-      |
-      v
-  ~/.zshrc      (interactive shell, run each new tab)
-      |
-      |-- sources aliases.sh
-      |-- sources functions.sh
-      |-- sets PATH entries
-      v
-  prompt appears
+      ↓
+~/.zshrc is read top to bottom
+      ↓
+Aliases, functions, and PATH changes take effect
+      ↓
+Prompt appears, ready for input
 ```
 
-PATH is a colon-separated list of directories. When you type `node`, the shell searches each directory in PATH from left to right and runs the first `node` binary it finds. This is why version managers prepend their directory: `~/.fnm/` appears before `/usr/local/bin/` so fnm's Node wins.
+Every change to `~/.zshrc` requires a reload:
+```bash
+source ~/.zshrc
+```
 
-Aliases rename commands. They are simple text substitutions with no argument handling:
+### PATH: Where the Shell Finds Commands
+
+When you type `node`, the shell searches a list of directories for an executable named `node`. That list is the `PATH` variable:
 
 ```bash
-alias gs="git status"
+echo $PATH
+# /usr/local/bin:/usr/bin:/bin:/home/you/.local/bin
 ```
 
-Shell functions are small programs. They accept positional arguments (`$1`, `$2`, `"$@"`) and can contain logic:
+When fnm installs Node, it adds its directory to PATH. If a command is "not found," the tool's directory is missing from PATH.
 
-```bash
-mkcd() { mkdir -p "$1" && cd "$1"; }
-```
+### Aliases vs Shell Functions
 
-The distinction matters: use an alias when you just want a shorter name, use a function when you need to handle arguments or run multiple steps.
+| | Alias | Function |
+|---|-------|---------|
+| Use for | Shortening a fixed command | Commands with logic or arguments |
+| Syntax | `alias gs="git status"` | `mkcd() { mkdir "$1" && cd "$1"; }` |
+| Accepts arguments | No | Yes |
 
 ## Build It
 
-### Step 1: Open your shell startup file
-
-Open `~/.zshrc` in VS Code:
+### Step 1: Open your ~/.zshrc
 
 ```bash
 code ~/.zshrc
 ```
 
-If the file does not exist, VS Code will create it. Add a line at the bottom to source your aliases file once you create it. Using a separate file keeps `.zshrc` readable:
+VS Code creates the file if it does not exist.
+
+### Step 2: Add git aliases
+
+Append to your `~/.zshrc`:
 
 ```bash
-source ~/dotfiles/aliases.sh
-source ~/dotfiles/functions.sh
-```
-
-For now, you can place the files anywhere. A `~/dotfiles/` directory is the conventional location.
-
-### Step 2: Create the aliases file
-
-Create `aliases.sh` with the content from `code/aliases.sh`. The file defines short names for the pnpm commands you will type most and three Git shortcuts.
-
-```bash
-#!/usr/bin/env bash
-
-alias dev="pnpm dev"
-alias build="pnpm build"
-alias lint="pnpm lint"
-alias fmt="pnpm format"
 alias gs="git status"
+alias ga="git add"
+alias gc="git commit"
 alias gp="git push"
-alias gl="git pull"
-
-ni() { pnpm install "$@"; }
-na() { pnpm add "$@"; }
-nrm() { pnpm remove "$@"; }
+alias gl="git log --oneline --graph --decorate --all"
+alias gco="git checkout"
+alias gcb="git checkout -b"
 ```
 
-`ni`, `na`, and `nrm` are functions rather than aliases because they forward arguments. `ni react` becomes `pnpm install react`. Aliases cannot do this.
+Reload: `source ~/.zshrc`. Now `gs` does what `git status` did.
 
-### Step 3: Create the functions file
-
-Create `functions.sh` with the content from `code/functions.sh`. Three functions cover the most common time-wasters:
+### Step 3: Add navigation aliases
 
 ```bash
-#!/usr/bin/env bash
+alias ..="cd .."
+alias ...="cd ../.."
+alias ll="ls -lah"
+alias la="ls -A"
+```
 
-mkcd() { mkdir -p "$1" && cd "$1"; }
+### Step 4: Create shell functions
 
-port-kill() {
-    local port=$1
-    lsof -ti :"$port" | xargs kill -9
+Functions accept arguments. Add these to `~/.zshrc`:
+
+```bash
+mkcd() {
+  mkdir -p "$1" && cd "$1"
 }
 
-node-version() {
-    node --version
-    pnpm --version
+port() {
+  lsof -i :"$1"
 }
 ```
 
-`mkcd` creates a directory and enters it in one step. `port-kill` kills whatever process is listening on a given port — useful when `pnpm dev` fails because port 3000 is already occupied. `node-version` prints both Node and pnpm versions for quick confirmation.
+`mkcd my-project` creates the folder and enters it in one step.
+`port 3000` shows what process is using port 3000.
 
-### Step 4: Reload the shell and test
+### Step 5: Install zoxide for smart navigation
 
-Source your `.zshrc` to apply the changes without opening a new terminal tab:
-
-```bash
-source ~/.zshrc
-```
-
-Test each alias and function:
+zoxide learns which directories you visit most and lets you jump to them instantly:
 
 ```bash
-gs           # should run git status
-node-version # should print node and pnpm versions
-mkcd /tmp/test-dir && pwd  # should create the dir and print its path
-port-kill 3000 # kills anything on port 3000; safe if nothing is running
+brew install zoxide
 ```
 
-If a command is not found, check that the `source` lines in `.zshrc` point to the correct file paths.
+Add to `~/.zshrc`:
+```bash
+eval "$(zoxide init zsh)"
+```
+
+After visiting a directory a few times, `z my-app` jumps there from anywhere on the machine.
+
+### Step 6: Install Starship prompt
+
+Starship shows git branch, Node version, and current directory in the prompt automatically — no commands needed:
+
+```bash
+brew install starship
+```
+
+Add at the very end of `~/.zshrc`:
+```bash
+eval "$(starship init zsh)"
+```
+
+Reload your terminal. Your prompt now shows the active git branch and Node version at all times.
 
 ## Use It
 
-The dotfiles pattern scales into a set of well-maintained tools:
-
-- **zoxide** (`brew install zoxide`): a smarter `cd` that learns your most-visited directories. `z proj` jumps to your projects folder. It replaces `cd` entirely for navigation and works from any shell startup file.
-- **fzf** (`brew install fzf`): fuzzy finder that integrates with shell history. Press Ctrl+R to search your command history interactively instead of scrolling. It also powers fuzzy file selection in many other tools.
-- **starship** (`brew install starship`): a cross-shell prompt written in Rust. It reads your current directory, git branch, Node version, and active language version and displays them in the prompt. One config file works across zsh, bash, and fish.
-
-All three follow the same dotfiles pattern: install the tool, add one line to `.zshrc`, and the behavior is active in every new terminal session.
+Large projects wrap common operations in `scripts/` shell files. Instead of remembering `pnpm run lint && pnpm run typecheck && pnpm run build`, a `./scripts/check.sh` runs the whole sequence. The principle is identical to your aliases: name the thing, call the name. Lesson 12 builds this into a `build-check.sh` for your deploy workflow.
 
 ## Ship It
 
-The `aliases.sh` and `functions.sh` files in `code/` are the reusable artifacts from this lesson. Keep them in a personal dotfiles repository on GitHub (private is fine). On a new machine:
+A **dotfiles repository** — a git repo at `~/dotfiles/` containing your `~/.zshrc`, `~/.gitconfig`, and any other shell configs. When you get a new machine, clone the repo and run a setup script. Every professional developer maintains one.
 
+Start now:
 ```bash
-git clone git@github.com:yourname/dotfiles.git ~/dotfiles
-echo "source ~/dotfiles/aliases.sh" >> ~/.zshrc
-echo "source ~/dotfiles/functions.sh" >> ~/.zshrc
-source ~/.zshrc
+mkdir ~/dotfiles
+cp ~/.zshrc ~/dotfiles/.zshrc
+ln -sf ~/dotfiles/.zshrc ~/.zshrc
+cd ~/dotfiles && git init && git add . && git commit -m "init: dotfiles"
 ```
-
-That is the entire setup. Your full workflow automation is available in under a minute on any machine.
 
 ## Exercises
 
-1. Add a `gco` alias for `git checkout` to `aliases.sh`. Reload the shell and confirm it works.
-2. Write a `new-fe` function that creates a directory with the name of its first argument, enters it, and runs `pnpm create vite@latest .` inside it. Test it by creating a throwaway project.
-3. Create a private GitHub repository named `dotfiles`, push your `aliases.sh` and `functions.sh` files to it, and update your `.zshrc` to source them from `~/dotfiles/` after cloning.
+1. Add an alias `cdp` that navigates to your main projects folder. Open a new terminal tab and confirm it works. Why does it require a new tab (or `source ~/.zshrc`) after editing?
+
+2. Write a shell function `newapp` that takes a project name, runs `pnpm create vite $1 --template react-ts`, then enters the new folder. Test it.
+
+3. Run `echo $PATH` and find which directory fnm added. Temporarily break PATH: `export PATH=/usr/bin:/bin`. Try running `node`. What error appears? Open a new terminal tab and explain why it recovered.
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| Dotfiles | "Share your dotfiles" | Hidden configuration files in your home directory (`~/.zshrc`, `~/.gitconfig`) and the repo that tracks them |
-| Alias | "I aliased that" | A shell-level text substitution that renames a command; no argument handling |
-| Shell function | "I wrote a function for that" | A named block of shell code that accepts arguments and can contain logic |
-| PATH | "Add it to your PATH" | The colon-separated list of directories the shell searches for executables |
-| source | "Source your rc file" | Execute a shell script in the current shell session, applying its variable and alias definitions immediately |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Shell** | "The black window hackers use" | A program that interprets text commands — zsh on macOS, bash on most Linux |
+| **~/.zshrc** | "A config file I should not touch" | A script that runs on every terminal open — your personal automation center |
+| **PATH** | "An OS environment variable, not my concern" | A colon-separated list of directories the shell searches when you type a command name |
+| **Alias** | "A shortcut" | A named substitution — cannot accept arguments, replaced verbatim |
+| **Shell function** | "An alias with extra steps" | A reusable named block that accepts arguments and can contain logic |
+| **dotfiles** | "Hidden config files" | Configuration files starting with `.`, typically version-controlled in `~/dotfiles` |
 
 ## Further Reading
 
-- [zsh Documentation](https://zsh.sourceforge.io/Doc/Release/zsh_toc.html) — authoritative reference for startup file load order and shell options
-- [The Missing Semester: Shell Tools](https://missing.csail.mit.edu/2020/shell-tools/) — MIT lecture covering aliases, functions, and dotfile management
-- [Starship Prompt](https://starship.rs) — cross-shell prompt with zero configuration required to get started
+- [Zsh guide](https://zsh.sourceforge.io/Guide/) — complete reference for zsh configuration
+- [zoxide](https://github.com/ajeetdsouza/zoxide) — the smarter cd replacement
+- [Starship prompt](https://starship.rs/) — cross-shell prompt with git and runtime info
+- [GitHub dotfiles](https://dotfiles.github.io/) — community dotfile repos and inspiration

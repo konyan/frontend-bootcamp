@@ -1,75 +1,109 @@
 # TypeScript Configuration & Path Aliases
 
-> A tsconfig is not boilerplate — it is the contract your compiler enforces on every line of code.
+> TypeScript is JavaScript with rules. The rules catch bugs before they reach users.
 
 **Type:** Build
 **Languages:** TypeScript
-**Prerequisites:** Lesson 09
+**Prerequisites:** Lesson 09 — SWC, Babel & Transpilation
 **Time:** ~75 minutes
+
+## Learning Objectives
+
+- Understand what TypeScript adds to JavaScript and why strict mode matters
+- Read and configure `tsconfig.json` without guessing at options
+- Set up path aliases so imports use `@/` instead of `../../..`
+- Wire path aliases in both tsconfig and Vite so they work in the editor and in the build
 
 ## The Problem
 
-A developer writes `import { Button } from '../../../components/ui/Button'` in every file. When they refactor the folder structure, 40 import paths break simultaneously. TypeScript catches some of the breakage, but the errors are cryptic because `strict` mode is off — `null` values pass through as non-null types, causing runtime crashes that the compiler should have caught at the source.
+A developer writes a function that reads `user.name`. A teammate calls it and passes `null` by mistake. The app crashes at runtime with "Cannot read properties of null". TypeScript would have caught this at the moment the mistake was made — but only if `strict` mode is on. On this project it is off, turned off a year ago to silence an error someone did not want to fix. The safety net was quietly removed.
 
-A new developer joins the team and cannot tell which compiler options are active or why. The tsconfig has `"strict": false` because someone turned it off a year ago to silence a compile error rather than fix it. The safety net was quietly removed, and nobody noticed until a production incident surfaced a null dereference that TypeScript would have flagged.
+A second problem: as the project folder structure deepens, imports look like this:
 
-The root cause is treating `tsconfig.json` as a file you copy once and never revisit. A well-configured tsconfig is the single place where the team agrees on what TypeScript will and will not tolerate — and path aliases make that config pay dividends every time someone writes an import.
+```ts
+import { Button } from '../../../components/ui/Button'
+import { formatDate } from '../../../../lib/utils'
+```
+
+Every `../../..` chain breaks when a file moves. Updating 40 import paths in a refactor is the kind of work that makes people avoid refactoring. A path alias (`@/components/ui/Button`) is stable regardless of where the importing file lives.
 
 ## The Concept
 
-**The TypeScript compiler pipeline:**
+### What TypeScript Adds
+
+TypeScript is a superset of JavaScript. Every JS file is valid TypeScript. TypeScript adds type annotations that the compiler checks before running:
+
+```ts
+function greet(name) {           // JavaScript — no type info
+  return 'Hello ' + name
+}
+
+function greet(name: string) {   // TypeScript — type checked
+  return 'Hello ' + name
+}
+
+greet(42)  // TypeScript catches: Argument of type 'number' is not assignable to 'string'
+```
+
+### The Two-Stage Pipeline
 
 ```
 Source files (.ts, .tsx)
         |
         v
-   Type Checker   <-- tsconfig.json controls this stage
+   Type Checker   ← tsconfig.json controls this
         |
         v
-     Emitter      <-- produces .js (or noEmit skips this)
+     Emitter      ← produces .js (or skips with noEmit)
         |
         v
-  Bundler (Vite)  <-- picks up the output
+  Bundler (Vite)  ← picks up the output
 ```
 
-The type checker and the emitter are separate. `noEmit: true` tells TypeScript to check types but produce no output — the bundler handles that. This separation is why you run `tsc --noEmit` in CI and `vite build` for the actual artifact.
+`noEmit: true` tells TypeScript to type-check without producing output files — the bundler handles that. Run `tsc --noEmit` in CI to catch type errors; run `vite build` to produce the artifact.
 
-**`strict` is a shorthand flag.** Enabling `"strict": true` turns on a collection of individual flags at once:
+### `strict` Mode
 
-| Flag | What it catches |
-|------|----------------|
-| `noImplicitAny` | Variables inferred as `any` without an explicit annotation |
-| `strictNullChecks` | Using a value that could be `null` or `undefined` without narrowing |
-| `strictFunctionTypes` | Unsafe function parameter covariance |
-| `strictBindCallApply` | Wrong argument types in `.bind`, `.call`, `.apply` |
+`"strict": true` enables a collection of safety checks at once. The two most important:
 
-`noUncheckedIndexedAccess` is not part of `strict` but is worth adding: it makes array indexing return `T | undefined` instead of `T`, which matches reality.
+**`strictNullChecks`** — without this, `null` passes anywhere without error:
+```ts
+function getLength(str: string | null): number {
+  return str.length          // Error: str could be null
+}
 
-**`moduleResolution: bundler`** is the modern default for Vite and Next.js projects. It understands that a bundler handles module resolution at build time rather than following Node.js file-system rules. The alternative, `node16`, is correct for projects that run directly in Node without a bundler.
-
-**Path alias resolution** requires agreement between two tools:
-
-```
-tsconfig.json                vite.config.ts
-─────────────                ──────────────
-"baseUrl": "."               resolve: {
-"paths": {                     alias: {
-  "@/*": ["./src/*"]             "@": path.resolve(__dirname, "./src")
-}                            }
-                             }
-
-     At type-check time           At bundle time
-     TypeScript resolves          Vite resolves
-     @/Button → ./src/Button      @/Button → ./src/Button
+function getLength(str: string | null): number {
+  return str?.length ?? 0   // Fixed: check before access
+}
 ```
 
-If only one side is configured, imports work in the editor or in the build — but not both. Both must agree on the mapping.
+**`noImplicitAny`** — prevents variables from silently becoming `any`:
+```ts
+function process(data) { }       // Error: implicit any
+function process(data: unknown) { }  // Required: be explicit
+```
+
+### Path Aliases — Two Tools, One Mapping
+
+Path aliases require configuration in both TypeScript (for the editor) and Vite (for the build):
+
+```
+tsconfig.json                  vite.config.ts
+──────────────                 ──────────────
+"baseUrl": "."                 resolve: { alias: {
+"paths": {                       "@": "./src"
+  "@/*": ["./src/*"]           }}
+}
+     At type-check time             At bundle time
+     TypeScript resolves            Vite resolves
+     @/Button → ./src/Button        @/Button → ./src/Button
+```
+
+If only one side is configured, the alias works in the editor or the build — but not both.
 
 ## Build It
 
 ### Step 1: Create `tsconfig.json`
-
-Copy `code/tsconfig.json` to the root of your project. Walk through each group of options:
 
 ```json
 {
@@ -82,8 +116,6 @@ Copy `code/tsconfig.json` to the root of your project. Walk through each group o
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -103,94 +135,98 @@ Copy `code/tsconfig.json` to the root of your project. Walk through each group o
 }
 ```
 
-`target` and `lib` describe the runtime environment. `module: ESNext` keeps import/export syntax for the bundler. `isolatedModules: true` prevents patterns that break Vite's file-by-file transpilation.
-
-### Step 2: Add path aliases
-
-The `baseUrl` and `paths` block at the bottom of `compilerOptions` is what TypeScript uses at type-check time. `baseUrl: "."` means all paths resolve from the project root. The `@/*` alias maps to `./src/*`.
-
-Verify it: create `src/lib/utils.ts` with any export, then import it as `@lib/utils` in another file. Run `tsc --noEmit` — it should pass.
-
-### Step 3: Mirror the aliases in Vite
-
-Open `vite.config.ts` and add the `resolve.alias` block so Vite knows the same mapping at bundle time:
+### Step 2: Add path aliases to Vite
 
 ```ts
-import path from "path";
+import path from 'path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
 
 export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-});
+})
 ```
 
-A single `@` alias covering `./src` is usually sufficient. If you added granular aliases (`@components`, `@lib`) in tsconfig, add matching entries here.
+### Step 3: Write and verify an aliased import
 
-### Step 4: Write an aliased import and type-check it
-
-Create or update a file that uses `@/` imports, like `code/example.ts`:
-
+Create `src/lib/utils.ts`:
 ```ts
-import type { User } from "@lib/types";
-import { formatDate } from "@lib/utils";
-import { useUser } from "@hooks/useUser";
-
-const displayUser = (user: User): string => {
-  return `${user.name} joined on ${formatDate(user.createdAt)}`;
-};
-
-export { displayUser };
+export const formatDate = (date: Date): string =>
+  date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 ```
 
-Run:
+Import it with an alias in another file:
+```ts
+import { formatDate } from '@lib/utils'
+```
 
+Run type-check:
 ```bash
 pnpm tsc --noEmit
 ```
 
-No output means no errors. Any error here means either the path alias is misconfigured or the imported module has a type mismatch.
+No output means no errors.
 
-### Step 5: Enable `strict: true` and fix the first two errors
+### Step 4: Enable strict and fix the first errors
 
-If you are adding this tsconfig to an existing project, `strict: true` will likely surface errors immediately. The two most common are:
+If adding this tsconfig to an existing project, `strict: true` surfaces errors. The two most common:
 
-1. `Object is possibly 'null'` — add a null check or use the optional chaining operator.
-2. `Parameter 'x' implicitly has an 'any' type` — add an explicit type annotation.
+```
+Object is possibly 'null'.         → add optional chaining or a null check
+Parameter 'x' implicitly has 'any' type. → add a type annotation
+```
 
-Fix these one at a time rather than suppressing them with `// @ts-ignore`. Each one removed is a genuine bug prevented.
+Fix one at a time. Each is a real bug prevented.
+
+### Step 5: Run tsc in CI
+
+Add a script to `package.json`:
+```json
+{
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
+```
+
+`pnpm typecheck` fails with exit code 1 on any type error. Add it to your CI pipeline alongside `lint` and `build`.
 
 ## Use It
 
-`create-next-app --typescript` already generates a `tsconfig.json` with `@/*` path aliases wired. The generated file uses `"moduleResolution": "bundler"` and sets `"strict": true` — the same choices made here. The difference is that Next.js also handles the bundler side of alias resolution automatically via its Webpack config, so you only configure `tsconfig.json`.
+`create-next-app --typescript` generates a tsconfig with `@/*` path aliases pre-wired. It uses `"moduleResolution": "bundler"` and `"strict": true` — the same choices made here. Next.js handles the Webpack side of alias resolution automatically, so you only configure `tsconfig.json`.
 
-The `ts-reset` library extends TypeScript's built-in lib types with safer defaults: `JSON.parse` returns `unknown` instead of `any`, `Array.filter(Boolean)` narrows correctly, and `fetch` response types are tighter. Add it with `import "@total-typescript/ts-reset"` in a global `.d.ts` file.
+`ts-reset` patches unsafe TypeScript defaults: `JSON.parse` returns `unknown` instead of `any`, array `.filter(Boolean)` narrows correctly. Add it with `import "@total-typescript/ts-reset"` in a global `.d.ts` file.
 
 ## Ship It
 
-The `tsconfig.json` and `tsconfig.node.json` in `code/` are ready to drop into any new Vite + React + TypeScript project. Copy them to the project root and update the `paths` block to match your folder structure. Run `tsc --noEmit` to confirm there are no immediate errors before the first commit.
+The `tsconfig.json` from `code/` is ready to drop into any Vite + React + TypeScript project. Copy it to the project root, update `paths` to match your folder structure, and run `pnpm typecheck` before the first commit.
 
 ## Exercises
 
-1. Add `"noUncheckedIndexedAccess": true` to your tsconfig and run `tsc --noEmit`. Find every place where array access needs a guard (`if (item !== undefined)`) and add it.
-2. Create a `tsconfig.base.json` with the shared `compilerOptions`, then have `tsconfig.json` extend it with `"extends": "./tsconfig.base.json"`. Add only the project-specific options (`paths`, `include`) in the leaf config.
-3. Explain in writing why both `tsconfig.json` and `vite.config.ts` need path aliases configured, and what breaks if only one of them has the mapping.
+1. Add `"noUncheckedIndexedAccess": true` and run `tsc --noEmit`. Find every array access that needs a guard and add one.
+
+2. Create a `tsconfig.base.json` with shared `compilerOptions` and extend it from `tsconfig.json` with `"extends": "./tsconfig.base.json"`. Put only project-specific options (`paths`, `include`) in the leaf config.
+
+3. Explain in writing: why do both `tsconfig.json` and `vite.config.ts` need path aliases? What breaks if only one has the mapping?
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| strict mode | "turn on strict" | A single flag that enables ~8 individual safety checks in one |
-| path alias | "@/ imports" | A string prefix mapped to a filesystem path in both the type checker and bundler |
-| moduleResolution | "bundler mode" | Which algorithm TypeScript uses to locate imported files |
-| type checking | "running tsc" | The phase where TypeScript validates types without producing output |
-| tsconfig | "the config file" | The JSON file that controls the TypeScript compiler for an entire project |
-| composite projects | "project references" | A tsconfig feature that lets one tsconfig depend on another for incremental builds |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Type annotation** | "Optional documentation" | An explicit declaration that the compiler enforces — not a comment |
+| **strict mode** | "Makes TypeScript harder" | A single flag enabling ~8 safety checks that catch null errors, implicit any, and more |
+| **noEmit** | "TypeScript not doing anything" | Run type-check only, no output files produced — the bundler handles building |
+| **Path alias** | "A nice-to-have shortcut" | A stable import prefix configured in both tsconfig and the bundler — breaks relative-path fragility |
+| **moduleResolution: bundler** | "Advanced setting for bundlers" | Tells TypeScript to resolve imports the same way Vite/webpack do — required for path aliases to work |
 
 ## Further Reading
 
-- [TypeScript tsconfig reference](https://www.typescriptlang.org/tsconfig) — authoritative docs for every compiler option
-- [TypeScript strict mode](https://www.typescriptlang.org/docs/handbook/2/basic-types.html#strictness) — explains what each flag in the strict family does
-- [ts-reset](https://github.com/total-typescript/ts-reset) — library that patches unsafe defaults in TypeScript's built-in types
+- [TypeScript tsconfig reference](https://www.typescriptlang.org/tsconfig) — every compiler option documented
+- [TypeScript strict mode](https://www.typescriptlang.org/docs/handbook/2/basic-types.html#strictness) — what each flag in the strict family does
+- [Total TypeScript: ts-reset](https://github.com/total-typescript/ts-reset) — patches unsafe TypeScript defaults
+- [Vite path aliases](https://vitejs.dev/config/shared-options.html#resolve-alias) — official Vite alias documentation

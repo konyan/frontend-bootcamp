@@ -1,121 +1,197 @@
 # Essential Extensions & Workspace Hygiene
 
-> The best workspace has only the tools the project needs — visible, consistent, and conflict-free.
+> One formatter. One linter. Committed config files. Everything else is noise.
 
 **Type:** Build
-**Languages:** TypeScript
+**Languages:** JavaScript, TypeScript
 **Prerequisites:** Lesson 03 — IDE Mastery with VS Code
 **Time:** ~45 minutes
 
+## Learning Objectives
+
+- Install the essential VS Code extensions for frontend development
+- Configure Prettier as the single formatter and prevent ESLint conflicts
+- Create `.prettierrc` and `.editorconfig` files that enforce consistent style
+- Add `.vscode/extensions.json` so teammates install the correct extensions automatically
+
 ## The Problem
 
-A new team member installs 30 extensions because "they might be useful." The project uses Prettier for formatting, but they also have the Beautify extension active. Both fire on save and fight each other — sometimes Prettier wins, sometimes Beautify, and the file never settles. One developer's editor formats with single quotes; another formats with double quotes because they each have different personal settings and no `.prettierrc` checked in.
+A team of four developers all use VS Code. One has Prettier installed. One has a different formatter called Beautify. Two have nothing. Every save rewrites the file slightly differently — different quote styles, different semicolons, different trailing commas. Every pull request has hundreds of diff lines that are pure whitespace noise, hiding the real changes.
 
-A second problem: there is no `.vscode/extensions.json` in the repository. Every developer has a different extension set. Half the team has Tailwind CSS IntelliSense installed; the other half writes class names blind. Nobody knows which extensions the project actually requires, and onboarding a new developer means a half-hour of "which extensions do I need to install?" conversation.
+The CI pipeline enforces ESLint. But ESLint also has formatting rules turned on, and they conflict with Prettier — both tools rewrite the same lines in opposite directions. Developers disable one, then the other, then give up and ignore all the warnings.
 
-A good workspace defines its tools clearly, avoids redundancy, and encodes the agreed style in config files that everyone gets when they clone.
+This chaos is entirely preventable. The rule is simple: one tool formats, one tool lints, and neither does the other's job.
 
 ## The Concept
 
-Extensions fall into four categories. Understanding the category prevents conflicts:
+### The Four Extension Categories
 
-| Category | Role | Examples |
-|----------|------|---------|
-| Formatter | Rewrites code style on save | Prettier, Biome |
-| Linter | Flags code quality issues | ESLint, Biome |
-| Language server | Provides IntelliSense, types | TypeScript, Tailwind CSS |
-| Utility | Augments the editor UX | GitLens, Error Lens, Spell Checker |
+| Category | Job | Tool |
+|----------|-----|------|
+| Formatter | Makes code look consistent | Prettier |
+| Linter | Finds bugs and bad patterns | ESLint |
+| Language server | Type checking and autocomplete | TypeScript (built-in) |
+| Utility | Git blame, error display, icons | GitLens, Error Lens |
 
-**The golden rule:** only one formatter should own a file type. If Prettier is the formatter for `.ts` files, no other extension should also format `.ts` on save. Explicit per-language formatter settings prevent this.
+**The golden rule:** one formatter only. If Prettier is configured, disable all ESLint formatting rules with `eslint-config-prettier`. ESLint catches bugs (`no-unused-vars`, `no-console`), not where semicolons go.
+
+### Config File Hierarchy
 
 ```
-project root
-├── .vscode/
-│   ├── extensions.json   ← tells VS Code which extensions to recommend
-│   └── settings.json     ← workspace rules that override user settings
-└── .prettierrc           ← style config committed to git, shared by everyone
+Project root/
+├── .prettierrc          ← Prettier formatting rules
+├── eslint.config.js     ← ESLint bug-finding rules
+├── .editorconfig        ← Editor-agnostic settings (indentation, line endings)
+└── .vscode/
+    ├── settings.json    ← VS Code settings for this project
+    └── extensions.json  ← Recommended extensions for this project
 ```
 
-`extensions.json` uses `"recommendations"` — VS Code prompts team members to install them, but does not force it. The style config files (`.prettierrc`, `eslint.config.js`) do the actual enforcement regardless of which extensions are installed.
+`.editorconfig` is read by VS Code, JetBrains, Vim, and most other editors. It ensures teammates not using VS Code still get consistent indentation and line endings.
 
 ## Build It
 
-### Step 1: Install the recommended extensions
+### Step 1: Install the essential extensions
 
-Open the Extensions panel, click the filter icon, choose "Show Recommended Extensions." Install everything in the list from `code/.vscode/extensions.json`. Verify each extension activates by checking the status bar when you open a `.ts` file.
+`Cmd+Shift+X` → search and install:
+
+| Extension ID | What it does |
+|-------------|-------------|
+| `esbenp.prettier-vscode` | Prettier formatter integration |
+| `dbaeumer.vscode-eslint` | ESLint inline error display |
+| `usernamehw.errorlens` | Shows error messages inline next to the code |
+| `eamodio.gitlens` | Git blame and history in the editor |
+| `PKief.material-icon-theme` | File icons for easier project navigation |
+| `christian-kohler.path-intellisense` | Autocomplete for import file paths |
 
 ### Step 2: Create `.prettierrc`
 
-Drop this into your project root (same content as `code/.prettierrc`):
-
 ```json
 {
-  "semi": true,
+  "semi": false,
   "singleQuote": true,
-  "tabWidth": 2,
   "trailingComma": "es5",
-  "printWidth": 100
+  "tabWidth": 2,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "arrowParens": "avoid"
 }
 ```
 
-Prettier reads this file automatically. Any developer who runs `prettier --write` gets identical output regardless of their editor settings.
+The specific values matter less than having a committed file everyone follows. Prettier enforces whatever is in this file, so debates about style end here.
 
-### Step 3: Set Prettier as the only formatter
+### Step 3: Create `.editorconfig`
 
-Use the workspace settings from `code/.vscode/settings.json`. The critical keys:
+```ini
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+trim_trailing_whitespace = false
+```
+
+`end_of_line = lf` prevents Windows developers from committing CRLF line endings that cause noisy diffs on every line of every file.
+
+### Step 4: Install and configure ESLint
+
+```bash
+pnpm add -D eslint @eslint/js eslint-config-prettier
+```
+
+Create `eslint.config.js`:
+
+```js
+import js from '@eslint/js'
+import prettierConfig from 'eslint-config-prettier'
+
+export default [
+  js.configs.recommended,
+  prettierConfig,
+  {
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-console': 'warn',
+    },
+  },
+]
+```
+
+`eslint-config-prettier` disables every ESLint rule that overlaps with Prettier. ESLint now only catches logic problems, never formatting.
+
+### Step 5: Create `.vscode/extensions.json`
+
+This file prompts teammates to install the recommended extensions when they open the project:
 
 ```json
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "prettier.requireConfig": true
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "usernamehw.errorlens",
+    "eamodio.gitlens"
+  ]
 }
 ```
 
-`prettier.requireConfig: true` means Prettier refuses to format a file if there is no `.prettierrc` — it will not silently apply defaults.
+Commit this file. It documents exactly which extensions this project relies on.
 
-### Step 4: Verify no conflicts
+### Step 6: Add format and lint scripts to package.json
 
-Open a `.ts` file, introduce a style violation (wrong quotes, missing semicolon), save. Confirm that exactly one formatter runs and the result matches `.prettierrc`. If you see the file "flicker" twice on save, a second formatter is active — find and disable it for TypeScript files.
+```json
+{
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint ."
+  }
+}
+```
+
+`pnpm format` fixes all files. `pnpm format:check` exits with code 1 if any file is unformatted — use this in CI to enforce consistency.
 
 ## Use It
 
-`create-next-app` with TypeScript scaffolds an `eslint.config.mjs` and expects Prettier to be configured separately. Larger projects use `prettier.config.js` (instead of `.prettierrc`) for dynamic configuration. The principle is the same: one source of truth for style, committed to git.
+Biome is a newer tool that combines formatting and linting in a single Rust binary — 25x faster than Prettier + ESLint with a single config file. The principle is identical (one formatter, one linter), just fewer moving parts:
 
-Biome is a newer alternative that bundles formatting and linting into a single tool — no Prettier + ESLint pair needed. For new projects this can simplify the extension setup, but the workspace hygiene pattern (one tool per role, config in git) is identical.
+```bash
+pnpm add -D @biomejs/biome
+npx @biomejs/biome init
+```
+
+Whether you choose Prettier + ESLint or Biome, the key is that every developer uses the same tool, with the same config file checked into git.
 
 ## Ship It
 
-The `code/.vscode/extensions.json`, `code/.vscode/settings.json`, and `code/.prettierrc` files form a portable workspace baseline. Copy all three into any new frontend project before the first commit.
-
-Save the extensions list somewhere you can retrieve it quickly — it is the fastest way to answer "what do I need to install?" for a new team member.
+A **workspace hygiene template**: the four files from this lesson (`.prettierrc`, `.editorconfig`, `eslint.config.js`, `.vscode/extensions.json`) checked into a template repository. Every new project starts by copying them. This is the baseline for consistent, reviewable code on any team.
 
 ## Exercises
 
-1. Add the "Import Cost" extension and observe bundle size hints as you import from `lodash` vs `lodash-es`.
-2. Write a `.prettierignore` file that skips `dist/`, `node_modules/`, and `*.generated.ts` files.
-3. Turn on `"prettier.requireConfig": true` in workspace settings, then remove `.prettierrc` and observe what Prettier does on save — then restore the file.
+1. Install Prettier and open a JavaScript file with mixed formatting (inconsistent quotes, varying spaces). Save with `"formatOnSave": true`. What changed? What did not change?
+
+2. Add `console.log("debug")` to a file. Run `pnpm lint`. Verify ESLint warns about it. Run `pnpm format:check` — does Prettier care? Why or why not?
+
+3. Look at a public open-source React project on GitHub. Find their `package.json`. Do they use Prettier? ESLint? Both? How do they prevent conflicts between the two?
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| Formatter | "Prettier is a linter" | A tool that rewrites code layout — quotes, spacing, trailing commas — without checking logic |
-| Linter | "ESLint formats my code" | A tool that flags code quality patterns (unused vars, missing deps array) — it does not reformat |
-| Language server | "TypeScript extension" | A background process that provides IntelliSense, type errors, and go-to-definition across files |
-| Extension recommendation | "Required extension" | A suggested list — VS Code prompts to install, but the developer can decline |
-| Workspace hygiene | "Best practices" | Keeping extension count low, removing conflicts, and encoding shared rules in committed config files |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Formatter** | "Same job as a linter" | A tool that rewrites code layout (spacing, quotes, commas) without changing behavior |
+| **Linter** | "Enforces style rules" | A tool that finds potential bugs and bad patterns — not responsible for visual formatting |
+| **eslint-config-prettier** | "Disables ESLint" | Disables only the ESLint rules that overlap with what Prettier handles — ESLint still runs |
+| **.editorconfig** | "A VS Code config file" | An editor-agnostic file read by VS Code, JetBrains, Vim, and others — works across all editors |
+| **Workspace recommendations** | "Optional suggestions" | Extensions in `.vscode/extensions.json` that VS Code offers to install when anyone opens the project |
 
 ## Further Reading
 
-- [Prettier docs](https://prettier.io/docs/en/index.html) — configuration options and editor integration
-- [ESLint getting started](https://eslint.org/docs/latest/use/getting-started) — rule configuration and flat config format
-- [VS Code Extension Marketplace](https://marketplace.visualstudio.com/vscode) — extension pages include the exact extension ID needed for `extensions.json`
+- [Prettier docs: options](https://prettier.io/docs/en/options.html) — all formatting options with examples
+- [ESLint getting started](https://eslint.org/docs/latest/use/getting-started) — configuration and rule reference
+- [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier) — why and how to disable conflicting rules
+- [EditorConfig spec](https://editorconfig.org/) — all supported properties and editor compatibility

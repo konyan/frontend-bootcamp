@@ -1,152 +1,188 @@
 # IDE Mastery with VS Code
 
-> A default editor leaves a lot of friction on the table. Frontend work gets easier when the editor helps you make fewer mistakes sooner.
+> An editor that understands your code catches bugs before you run anything.
 
-**Type:** Build
-**Languages:** TypeScript
-**Prerequisites:** Lesson 01
-**Time:** ~60 minutes
+**Type:** Learn
+**Languages:** JavaScript, TypeScript
+**Prerequisites:** Lesson 01 — Modern Development Environment
+**Time:** ~45 minutes
+
+## Learning Objectives
+
+- Distinguish between user settings and workspace settings and know when to use each
+- Use the command palette and core keyboard shortcuts to navigate without the mouse
+- Configure VS Code to show TypeScript errors, format on save, and highlight problems inline
+- Understand how the language server gives VS Code its code intelligence
 
 ## The Problem
 
-A developer opens a shared project and the formatter runs on save for them but not for their teammate. They spend ten minutes debugging before discovering the teammate's VS Code has a different default formatter set in their user settings, and the project has no `.vscode/settings.json` to override it. Meanwhile ESLint is running twice on every file because two extensions both registered themselves as the TypeScript language provider and neither knows about the other.
+A student opens VS Code and types `const x = null; x.toUpperCase()`. Nothing looks wrong — no red underline, no warning. They run the code and get `TypeError: Cannot read properties of null`. The editor gave no signal.
 
-These are not editor bugs. They are configuration gaps. VS Code gives every developer a blank slate by default, and blank slates diverge. The fix is to commit a workspace settings file that makes the editor behavior part of the project, the same way `package.json` makes the dependencies part of the project. Then there is one canonical configuration and every clone gets it automatically.
+Their mentor's editor shows a red squiggle the moment the mistake is typed, with the exact error message and a suggested fix. The mentor has not run anything yet.
+
+The difference is configuration. VS Code ships as a general-purpose text editor. To become a real IDE — a tool that understands your code — it needs a language server enabled, the right settings applied, and a formatter configured. This lesson shows exactly how to set that up.
 
 ## The Concept
 
-VS Code applies settings in a hierarchy. Lower levels override higher ones:
+### How VS Code Understands Code
+
+VS Code uses the Language Server Protocol (LSP) to connect the editor to language analysis tools:
 
 ```
-Default Settings         (VS Code built-ins, lowest priority)
-        |
-        v
-User Settings            (~/.config/Code/User/settings.json)
-        |
-        v
-Workspace Settings       (.vscode/settings.json in the repo, highest priority)
+You type code
+      ↓
+VS Code sends text to the TypeScript Language Server
+      ↓
+Language Server analyzes: types, imports, unused variables
+      ↓
+VS Code displays: red squiggles, hover docs, autocomplete
 ```
 
-User settings are your personal defaults across every project. Workspace settings are scoped to the open folder and committed to git. When both define the same key, the workspace setting wins.
+The TypeScript language server is built into VS Code. For other languages, an extension ships its own language server.
 
-Extensions have an activation model separate from settings. An extension declares in its `package.json` which file types or language IDs it handles. When VS Code opens a file of that type, it activates the matching extensions. If two extensions both handle `typescript`, you may get duplicate diagnostics, conflicting formatters, or double-running linters. The workspace settings `editor.defaultFormatter` and `editor.codeActionsOnSave` make the intended extension explicit so there is no ambiguity.
+### Settings Hierarchy
+
+VS Code has two levels of settings that stack:
 
 ```
-.vscode/settings.json  <-- committed to git, applies to all developers
-~/.config/Code/User/settings.json  <-- personal, not committed
-VS Code defaults  <-- apply when neither file says anything
+User Settings    (~/.config/Code/User/settings.json)
+      ↓ overridden by
+Workspace Settings  (.vscode/settings.json in the project)
 ```
+
+User settings apply to every project. Workspace settings apply only to the current project and override user settings. Commit `.vscode/settings.json` to git so the whole team uses the same editor config.
+
+### The Five Shortcuts You Need First
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd+Shift+P` | Command Palette — run any VS Code command by name |
+| `Cmd+P` | Quick Open — jump to any file by name |
+| `Cmd+click` | Go to definition |
+| `Shift+F12` | Find all references to this symbol |
+| `Cmd+Shift+F` | Search across all files |
 
 ## Build It
 
-### Step 1: Open workspace settings
+### Step 1: Open User Settings as JSON
 
-Press Cmd+Shift+P (macOS) or Ctrl+Shift+P (Windows/Linux) to open the command palette. Type "workspace settings json" and select "Preferences: Open Workspace Settings (JSON)".
+`Cmd+Shift+P` → type "Open User Settings JSON" → Enter.
 
-VS Code creates `.vscode/settings.json` in the project root if it does not exist and opens it. This is the file you will commit to the repository.
-
-### Step 2: Add the settings from code/.vscode/settings.json
-
-Paste the full settings object. Walk through each key:
+Add these foundational settings:
 
 ```json
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
-  "editor.rulers": [100],
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "files.exclude": {
-    "node_modules": true,
-    ".next": true,
-    "dist": true
-  },
-  "search.exclude": {
-    "node_modules": true,
-    "pnpm-lock.yaml": true
-  },
-  "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.patterns": {
-    "*.ts": "${capture}.js, ${capture}.d.ts",
-    "tsconfig.json": "tsconfig.*.json"
+  "editor.minimap.enabled": false,
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "explorer.confirmDelete": false,
+  "terminal.integrated.defaultProfile.osx": "zsh"
+}
+```
+
+### Step 2: Enable TypeScript inline feedback
+
+Add these to your user settings for real-time type checking:
+
+```json
+{
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.inlayHints.parameterNames.enabled": "literals",
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "javascript.suggest.autoImports": true
+}
+```
+
+### Step 3: Create a workspace settings file
+
+Inside any project folder, create `.vscode/settings.json`:
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.rulers": []
   }
 }
 ```
 
-Key explanations:
-- `editor.formatOnSave` + `editor.defaultFormatter`: runs Prettier on every save, using only the Prettier extension (not any other)
-- `editor.rulers`: draws a vertical guide at column 100, a common line-length limit for TypeScript projects
-- `editor.codeActionsOnSave` with `"explicit"`: runs ESLint auto-fixes on save, but only fixes that ESLint is confident about (not experimental ones)
-- `typescript.preferences.importModuleSpecifier`: generates `import { foo } from "@/components/Foo"` instead of `../../components/Foo` when using path aliases
-- `files.exclude` + `search.exclude`: hides generated directories from the file explorer and search results, reducing noise
-- `explorer.fileNesting.patterns`: nests `.d.ts` and compiled `.js` files under their `.ts` source in the explorer
+The `[markdown]` key applies settings only to Markdown files — per-language overrides work for any language identifier.
 
-### Step 3: Bind two keyboard shortcuts
+### Step 4: Practice the five navigation shortcuts
 
-Press Cmd+K, Cmd+S to open the keybindings editor. Two shortcuts to add or confirm:
+Open a project and navigate only with shortcuts for five minutes — no mouse, no Explorer panel clicks:
 
-- **Toggle terminal**: Ctrl+` (backtick) — opens and closes the integrated terminal without leaving the keyboard
-- **Toggle sidebar**: Cmd+B (macOS) / Ctrl+B (Windows/Linux) — gives the editor the full width when you need to focus on code
+- `Cmd+P` to jump between files
+- `Cmd+click` to follow a function to its definition
+- `Shift+F12` to see everywhere a function is called
+- `Cmd+Shift+O` to jump to a symbol (function/variable) within the current file
+- `Cmd+Shift+P` → "Go to Line" to jump to a specific line number
 
-These are VS Code defaults. Confirming they work is faster than discovering they are remapped when you need them.
+### Step 5: Configure the integrated terminal
 
-### Step 4: Practice command palette navigation
+Use VS Code's built-in terminal instead of switching applications:
 
-The command palette (Cmd+Shift+P) runs any VS Code command by name. Muscle memory for these two removes the need to touch the mouse for the most common navigations:
+- Open: `` Cmd+` ``
+- New terminal: `Cmd+Shift+5`
+- Split: `Cmd+\`
 
-- **Go to Symbol in File** (Cmd+Shift+O): lists every function, class, and variable in the current file. Type to filter. This is how you navigate a 300-line file without scrolling.
-- **Go to Definition** (F12 or Cmd+click): jumps to where a function or type is defined, even if it is in `node_modules`. Essential for understanding third-party APIs.
-
-Open a TypeScript file in any project and practice jumping between symbols with Cmd+Shift+O, then navigate back with Ctrl+- (go back).
-
-## Use It
-
-Two extensions layer on top of workspace settings to surface TypeScript errors more visibly:
-
-**Error Lens** (`usernamehw.errorlens`): displays the diagnostic message inline on the line where the error occurs, rather than requiring you to hover over the red underline. TypeScript errors become impossible to miss.
-
-**Pretty TypeScript Errors** (`yoavbls.pretty-ts-errors`): reformats the cryptic multi-line TypeScript error messages into structured, readable output. The same error that used to require ten seconds of parsing becomes immediately clear.
-
-Install both from the Extensions sidebar (Cmd+Shift+X). They read the existing TypeScript language server output and add no new configuration. Commit their extension IDs to `.vscode/extensions.json` so VS Code recommends them to anyone who clones the project:
-
+Add to user settings:
 ```json
 {
-  "recommendations": [
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
-    "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors"
-  ]
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.lineHeight": 1.2
 }
 ```
 
+### Step 6: Verify error detection works
+
+Create `test-errors.ts` in any project with a tsconfig.json:
+```typescript
+const user = null
+console.log(user.name)
+```
+
+If VS Code is configured correctly, `user.name` shows a red squiggle immediately with the message "Object is possibly 'null'". If it does not, check that the TypeScript extension is active in the Extensions panel.
+
+## Use It
+
+VS Code Remote Development lets the editor UI run locally while the code and terminal run on a remote server or Docker container. The extensions `Remote - SSH` and `Dev Containers` enable this. Your shortcuts and settings work identically — only the filesystem changes. Teams use this to give every developer an identical Linux environment regardless of their local OS.
+
 ## Ship It
 
-The `.vscode/settings.json` file in `code/` is the reusable artifact from this lesson. Copy it into the root `.vscode/` of every frontend project you start and commit it. Pair it with `.vscode/extensions.json` listing recommended extensions.
+A **`.vscode/` folder** committed to every project with:
+- `settings.json` — project-specific editor config
+- `extensions.json` — recommended extensions (covered in Lesson 04)
 
-A developer cloning the project for the first time will see a VS Code notification: "This workspace has extension recommendations." One click installs all of them. Combined with the settings file, the editor experience is consistent from the first open.
+When a teammate opens the project, VS Code reads these automatically. Add this pattern to your project template.
 
 ## Exercises
 
-1. Add `"editor.linkedEditing": true` to your workspace settings. Open an HTML file, click on an opening tag, and rename it. Observe what happens to the closing tag and explain why this setting matters for HTML/JSX editing.
-2. Install the "Error Lens" extension. Open a TypeScript file and intentionally introduce a type error (assign a string to a number variable). Describe what changed in how the error is displayed compared to the default behavior.
-3. Open two related frontend projects in one multi-root workspace. Create a `.code-workspace` file that includes both folders and observe how VS Code handles settings scope across roots.
+1. Open a `.js` file and type `const x = null; x.length`. Hover over `.length`. What does VS Code show? Rename the file to `.ts` — does the behavior change, and why?
+
+2. Use `Cmd+P` to navigate between three files without touching the Explorer sidebar. Then use `Cmd+Shift+O` to jump to a specific function by name within a file.
+
+3. Add `.vscode/settings.json` with `"editor.tabSize": 4` to a project. Verify it overrides your user setting of `2` only inside that project by checking the tab size indicator in the VS Code status bar.
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| Workspace settings | "Add it to the workspace settings" | VS Code configuration in `.vscode/settings.json`, scoped to one project and committed to git |
-| User settings | "Check your user settings" | Personal VS Code configuration at `~/.config/Code/User/settings.json`, applies globally across all projects |
-| Command palette | "Use the command palette" | The Cmd+Shift+P overlay that runs any VS Code command by name |
-| Multi-root workspace | "Open it as a workspace" | A VS Code session with multiple top-level folders, defined by a `.code-workspace` file |
-| Extension activation | "The extension isn't activating" | The process by which VS Code loads an extension when a matching file type or condition is detected |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **Language Server** | "The plugin that adds syntax colors" | A separate process that analyzes types, imports, and references — communicates with the editor via LSP |
+| **User settings** | "The only settings file" | Settings stored in your home directory that apply globally to all projects |
+| **Workspace settings** | "Optional extras" | Per-project overrides in `.vscode/settings.json` — committed to git so the whole team shares them |
+| **Format on save** | "The editor auto-fixing my code" | Running the configured formatter (Prettier) every time a file is saved |
+| **Command Palette** | "The search bar" | A command runner that executes any VS Code action by name — faster than any menu |
 
 ## Further Reading
 
-- [VS Code: User and Workspace Settings](https://code.visualstudio.com/docs/getstarted/settings) — complete reference for the settings hierarchy and all available keys
-- [VS Code Keyboard Shortcuts Reference](https://code.visualstudio.com/docs/getstarted/keybindings) — the full default keybinding list for macOS, Windows, and Linux
+- [VS Code keyboard shortcuts (macOS)](https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf) — printable shortcut reference
+- [VS Code settings reference](https://code.visualstudio.com/docs/getstarted/settings) — every available setting documented
+- [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) — the protocol that powers editor intelligence
+- [VS Code Tips and Tricks](https://code.visualstudio.com/docs/getstarted/tips-and-tricks) — official productivity techniques

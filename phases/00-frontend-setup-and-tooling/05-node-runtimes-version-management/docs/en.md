@@ -1,150 +1,199 @@
 # Node.js Runtimes & Version Management
 
-> Pin the runtime version once, and never wonder why CI passes but local fails.
+> Pin the version. Write it down. Make it reproducible.
 
-**Type:** Build
+**Type:** Learn
 **Languages:** JavaScript
-**Prerequisites:** Lesson 01 — The Modern Development Environment
-**Time:** ~60 minutes
+**Prerequisites:** Lesson 01 — Modern Development Environment
+**Time:** ~45 minutes
+
+## Learning Objectives
+
+- Understand the difference between Node.js LTS and current releases
+- Use fnm to install multiple Node versions and switch between projects
+- Pin a Node version in `.nvmrc` and `package.json` so the team always uses the same one
+- Know when to consider Deno or Bun as Node alternatives
 
 ## The Problem
 
-A developer clones a three-year-old project and runs `pnpm install`. It fails with a cryptic native module compilation error. After 30 minutes of debugging they discover the project requires Node 16, but their global Node is 20. A teammate has Node 18. The CI pipeline runs Node 22. No one pinned a version. Every environment is slightly different, and bugs appear on one machine but not another with no obvious explanation.
+A developer clones a project from a colleague and runs `pnpm install`. It fails with a cryptic error about a native module. The developer has Node 22 installed. The project was built on Node 18 and uses a package that changed its native bindings between those versions.
 
-A second scenario: two projects live on the same laptop. Project A requires Node 16 for legacy reasons; Project B requires Node 20 for `fetch` built-in and modern crypto APIs. Switching between them means remembering to run `nvm use 16` or `nvm use 20` every time — and forgetting causes silent breakage.
+A second scenario: a developer upgrades Node globally to test a new feature, forgets about it, and three of their other projects start behaving differently. One project's test suite now has 47 new failures — not because the code changed, but because Node's behavior around a specific API changed between versions.
 
-Version managers solve both problems: they let you install multiple Node versions and switch between them per project, and pin files (`.nvmrc`, `.node-version`) tell the manager which version a project expects.
+A version manager solves both problems by letting you run different Node versions per directory, pinned in a file that is committed to git.
 
 ## The Concept
 
-**The Node.js release cycle:**
+### LTS vs Current
+
+Node.js maintains two release lines simultaneously:
 
 ```
-Current  →  Active LTS  →  Maintenance LTS  →  End of Life
-  (new features)  (stable)      (security only)     (drop it)
+Current  →  Active LTS  →  Maintenance  →  End of Life
+  (new features)  (stable, recommended)  (security only)  (unsupported)
 ```
 
-Even-numbered releases become LTS. Odd-numbered releases (19, 21) reach end of life after six months. For production apps, always pick an LTS version.
+| Release type | When to use |
+|-------------|-------------|
+| LTS (Long-Term Support) | Production projects, team environments |
+| Current | Experimenting with new Node features |
 
-**Runtime options:**
+LTS releases are supported for 30 months. A new LTS starts every October with an even major version (18, 20, 22). Use LTS for any project that other developers will run.
 
-| Runtime | Notes |
-|---------|-------|
-| Node.js | The standard. Use this unless you have a specific reason not to. |
-| Bun | Fast, built-in bundler/test runner — not yet a drop-in replacement for all Node APIs |
-| Deno | Different module system, good for scripts and edge functions |
+### How fnm Works
 
-**Version managers:**
+fnm stores each Node version in its own directory and creates symlinks in your PATH when you run `fnm use`:
 
-| Tool | Install speed | Auto-switch | Config file |
-|------|-------------|------------|-------------|
-| fnm | Very fast (Rust) | With shell hook | `.node-version` or `.nvmrc` |
-| nvm | Slow (bash) | Manual `nvm use` | `.nvmrc` |
-| Volta | Fast (Rust) | Automatic on `cd` | `package.json#volta` |
+```
+~/.fnm/node-versions/
+    v18.20.0/
+    v20.14.0/
+    v22.3.0/    ← active via PATH symlink
 
-**Pin files:** `.nvmrc` (widely supported) or `.node-version` (fnm default). Both contain just a version number. Commit the file to git so every developer and CI gets the same version.
+project-a/.nvmrc  →  v18
+project-b/.nvmrc  →  v22
+```
+
+When you `cd` into a project directory, fnm reads `.nvmrc` or `.node-version` and automatically switches to the pinned version.
+
+### The Three Version Managers
+
+| Tool | Speed | Auto-switch | Install |
+|------|-------|------------|---------|
+| fnm | Fast (Rust) | Yes | `curl \| bash` |
+| nvm | Slow (bash) | Yes | `curl \| bash` |
+| Volta | Fast (Rust) | Yes | `curl \| bash` |
+
+This curriculum uses fnm. All three are functionally equivalent for daily use.
 
 ## Build It
 
-### Step 1: Install fnm
+### Step 1: Install fnm and set up auto-switching
 
-On macOS with Homebrew:
-```bash
-brew install fnm
-```
+If you completed Lesson 01, fnm is already installed. Add auto-switching to your `~/.zshrc`:
 
-Or with the install script (macOS and Linux):
-```bash
-curl -fsSL https://fnm.vercel.app/install | bash
-```
-
-Add the shell hook to `~/.zshrc` (fnm prints the exact line during install):
 ```bash
 eval "$(fnm env --use-on-cd)"
 ```
 
-Reload the shell: `source ~/.zshrc`
+Now, whenever you `cd` into a project with a `.nvmrc` file, fnm automatically uses the correct Node version.
 
-### Step 2: Install and use Node 20
+### Step 2: Install the LTS version
 
 ```bash
-fnm install 20
-fnm use 20
-node --version
+fnm install --lts
+fnm list
 ```
 
-### Step 3: Pin the version in a project
+`fnm list` shows every Node version installed on your machine.
 
-In the project root:
+### Step 3: Pin a version with .nvmrc
+
+Inside your project folder, create `.nvmrc`:
+
+```
+22
+```
+
+That single number (major version only) tells fnm to use the latest Node 22. Commit this file.
+
+Now test auto-switching:
 ```bash
-echo "20" > .nvmrc
+cd /tmp && node --version   # shows default version
+cd ~/my-first-app && node --version   # shows v22.x
 ```
 
-With `--use-on-cd` in the shell hook, fnm switches to the pinned version automatically when you `cd` into the directory.
+### Step 4: Add an engines field to package.json
 
-### Step 4: Add the engines field to package.json
-
-The `engines` field in `package.json` makes pnpm enforce the constraint at install time:
+The `.nvmrc` tells fnm which Node to use. The `engines` field tells npm/pnpm to fail the install if the wrong version is used:
 
 ```json
 {
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=9.0.0"
   }
 }
 ```
 
-Enable the enforcement in `.npmrc`:
-```
+Enable engine enforcement in `.npmrc`:
+```ini
 engine-strict=true
 ```
 
-### Step 5: Verify with the check script
+Now `pnpm install` fails immediately on the wrong Node version instead of silently producing a broken `node_modules`.
+
+### Step 5: Install a second Node version and switch
 
 ```bash
-bash code/verify-node.sh
+fnm install 20
+fnm use 20
+node --version   # v20.x
+
+fnm use 22
+node --version   # v22.x
 ```
 
-The script reads the current Node version and exits with an error if it is below the required major version.
+### Step 6: Set a global default
+
+```bash
+fnm default 22
+```
+
+New terminal tabs now start with Node 22. Projects with a `.nvmrc` still auto-switch to their pinned version.
 
 ## Use It
 
-Volta takes a different approach — it reads `package.json#volta` and switches Node versions automatically when you `cd`, without any shell hook:
+Volta takes a different approach: it pins Node and pnpm versions inside `package.json` rather than in a separate `.nvmrc` file, which means there is one less file to maintain:
 
 ```json
 {
   "volta": {
-    "node": "20.11.0",
+    "node": "22.3.0",
     "pnpm": "9.1.0"
   }
 }
 ```
 
-Volta pins the exact patch version (not just `>=20`), which is stricter. Teams that want guaranteed reproducibility between developer machines often prefer Volta for this reason.
+`create-next-app` sets `"engines"` in `package.json` automatically. Reading that field tells you what Node version the project maintainers tested on — always check it before starting on a new codebase.
 
 ## Ship It
 
-Three files to commit to every project: `.nvmrc`, `package.json` with `engines`, and `verify-node.sh`. They document the runtime requirement, enforce it at install time, and give any developer a quick check command.
+A **`.nvmrc` + `.npmrc` pair** committed to every project:
+
+`.nvmrc`:
+```
+22
+```
+
+`.npmrc`:
+```ini
+engine-strict=true
+```
+
+These two files together pin the Node version and enforce it on install. Add them to your project template now.
 
 ## Exercises
 
-1. Install Node 18 alongside Node 20 with fnm (`fnm install 18`) and switch between them with `fnm use`.
-2. Add `"volta": {"node": "20.0.0"}` to a `package.json` and explain what this does for a teammate who has Volta installed but not fnm.
-3. Run `node --version` in a fresh terminal tab (without `cd`-ing into a project) and explain whether your version manager switches automatically or requires a manual command.
+1. Install two Node versions (18 and 22). Create two folders, each with a different `.nvmrc`. `cd` between them and verify `node --version` auto-switches.
+
+2. Add `"engines": { "node": ">=22.0.0" }` to a project's `package.json` and `engine-strict=true` to `.npmrc`. Switch to Node 18 with `fnm use 18`. Run `pnpm install`. What error do you get?
+
+3. Look up what changed between Node 18 and Node 22 on the [Node.js changelog](https://github.com/nodejs/node/blob/main/CHANGELOG.md). Find one change that could affect a frontend project's build tools. Write a one-sentence explanation of it.
 
 ## Key Terms
 
-| Term | What people say | What it actually means |
-|------|----------------|----------------------|
-| LTS | "The stable version" | Long-Term Support — even-numbered releases that receive security updates for 30 months |
-| Version manager | "nvm" | A tool that installs multiple Node versions and lets you switch between them |
-| Runtime | "Node" | The environment that executes JavaScript outside the browser |
-| .nvmrc | "The Node config file" | A plain text file containing a version number — read by fnm, nvm, and many CI tools |
-| engines field | "Locks the Node version" | A `package.json` field that declares version requirements — pnpm enforces it with `engine-strict=true` |
+| Term | Common Misconception | What It Actually Means |
+|------|---------------------|------------------------|
+| **LTS** | "An older, slower version" | Long-Term Support — the version recommended for production, maintained for 30 months |
+| **Version manager** | "Just for switching Node versions" | A tool that installs multiple runtimes and controls which one is active per directory |
+| **.nvmrc** | "A file only nvm reads" | A plain text file with a Node version — read by nvm, fnm, and Volta for auto-switching |
+| **engines field** | "Documentation in package.json" | A declaration that pnpm/npm enforces when `engine-strict=true` — fails install on wrong version |
+| **Current release** | "The latest and therefore the best" | The bleeding-edge release with new features but shorter support — not suitable for team projects |
 
 ## Further Reading
 
-- [fnm GitHub repo](https://github.com/Schniz/fnm) — installation and shell hook setup
-- [Node.js release schedule](https://nodejs.org/en/about/previous-releases) — LTS dates and EOL calendar
-- [Volta docs](https://docs.volta.sh/guide/) — alternative version manager with automatic switching
+- [Node.js release schedule](https://nodejs.org/en/about/releases/) — LTS dates and end-of-life timeline
+- [fnm documentation](https://github.com/Schniz/fnm) — installation, commands, and auto-switching setup
+- [Volta docs](https://docs.volta.sh/) — alternative version manager with package.json integration
+- [Node.js changelog](https://github.com/nodejs/node/blob/main/CHANGELOG.md) — what changed between versions
